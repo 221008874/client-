@@ -1,0 +1,322 @@
+import { useState, useEffect } from "react";
+import {
+  getAllLicenses,
+  createLicense,
+  updateLicenseStatus,
+  updateLicenseExpiry,
+} from "../services/firestoreService";
+import {
+  Table, TableBody, TableCell, TableHead, TableRow,
+  Button, TextField, Dialog, DialogTitle, DialogContent,
+  CircularProgress, Alert, Box, Typography, Chip
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+
+const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#04091a", position: "relative", overflow: "hidden" });
+
+const TopBar = styled(Box)({
+  background: "linear-gradient(to right, #090f22, #0c1830)",
+  borderBottom: "1px solid rgba(15,184,166,0.12)",
+  padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.50)", position: "relative",
+  "&::after": {
+    content: '""', position: "absolute", bottom: 0, left: 0, right: 0, height: "2px",
+    background: "linear-gradient(to right, transparent, #0fb8a6 35%, #3b82f6 65%, transparent)", opacity: 0.45,
+  },
+});
+
+const ContentWrapper = styled(Box)({ padding: "24px 28px", position: "relative", zIndex: 1 });
+
+const GlassPanel = styled(Box)({
+  background: "linear-gradient(to bottom, #0b1628, #081020)", borderRadius: "16px",
+  border: "1px solid rgba(15,184,166,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.55)", overflow: "hidden",
+});
+
+const StyledTableContainer = styled(Box)({
+  "& .MuiTable-root": { backgroundColor: "transparent" },
+  "& .MuiTableHead-root": { backgroundColor: "#0c1a30" },
+  "& .MuiTableCell-head": {
+    color: "#2dd4bf", fontWeight: 700, fontSize: "11px", letterSpacing: "0.8px",
+    textTransform: "uppercase", padding: "14px 20px", borderBottom: "1px solid rgba(15,184,166,0.12)",
+  },
+  "& .MuiTableRow-root": {
+    transition: "all 0.15s ease", borderBottom: "1px solid rgba(15,184,166,0.06)",
+    "&:nth-of-type(odd)": { backgroundColor: "rgba(8,16,32,0.35)" },
+    "&:hover": { backgroundColor: "rgba(15,184,166,0.09)" },
+  },
+  "& .MuiTableCell-body": { color: "#dde6f0", fontSize: "13px", padding: "14px 20px", borderBottom: "none" },
+});
+
+const StatusBadge = styled(Chip)(({ status }) => ({
+  borderRadius: "12px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", height: "28px", minWidth: "80px",
+  ...(status === "ACTIVE" ? {
+    backgroundColor: "rgba(52,211,153,0.14)", color: "#34d399",
+    border: "1px solid rgba(52,211,153,0.28)", boxShadow: "0 0 8px rgba(52,211,153,0.15)",
+  } : status === "EXPIRED" ? {
+    backgroundColor: "rgba(239,68,68,0.14)", color: "#ef4444",
+    border: "1px solid rgba(239,68,68,0.28)", boxShadow: "0 0 8px rgba(239,68,68,0.15)",
+  } : {
+    backgroundColor: "rgba(248,113,113,0.14)", color: "#f87171",
+    border: "1px solid rgba(248,113,113,0.28)", boxShadow: "0 0 8px rgba(248,113,113,0.15)",
+  }),
+  "&:hover": { cursor: "pointer", filter: "brightness(1.2)" },
+}));
+
+const ActionButton = styled(Button)(({ variant }) => ({
+  borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px", transition: "all 0.2s ease",
+  ...(variant === "primary" ? {
+    background: "linear-gradient(to right, #0fb8a6, #0d9488)", color: "white", boxShadow: "0 4px 14px rgba(15,184,166,0.40)",
+    "&:hover": { background: "linear-gradient(to right, #0d9488, #0b7a72)", boxShadow: "0 6px 20px rgba(15,184,166,0.60)", transform: "translateY(-1px)" },
+  } : variant === "warning" ? {
+    backgroundColor: "rgba(245,158,11,0.12)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.30)",
+    "&:hover": { backgroundColor: "#f59e0b", color: "white", boxShadow: "0 4px 12px rgba(245,158,11,0.40)" },
+  } : {
+    backgroundColor: "rgba(15,184,166,0.07)", color: "#2dd4bf", border: "1px solid rgba(15,184,166,0.20)",
+    "&:hover": { backgroundColor: "rgba(15,184,166,0.20)", borderColor: "#0fb8a6", color: "#eaf2ff" },
+  }),
+}));
+
+const StyledDialog = styled(Dialog)({
+  "& .MuiDialog-paper": {
+    backgroundColor: "#0b1628", borderRadius: "20px", border: "1px solid rgba(15,184,166,0.15)",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.80), 0 0 0 1px rgba(15,184,166,0.08)", overflow: "hidden",
+  },
+  "& .MuiDialogTitle-root": {
+    background: "linear-gradient(to right, #0d9488, #083040)", color: "white", fontSize: "18px", fontWeight: 700, padding: "20px 24px",
+    position: "relative",
+    "&::after": { content: '""', position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(to right, transparent, rgba(15,184,166,0.5), transparent)" },
+  },
+});
+
+const StyledDialogField = styled(TextField)({
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "#0f1e36", borderRadius: "10px",
+    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
+    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
+    "&.Mui-focused fieldset": { borderColor: "#0fb8a6", boxShadow: "0 0 0 3px rgba(15,184,166,0.15)" },
+  },
+  "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
+  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#0fb8a6" },
+  "& .MuiFormHelperText-root": { color: "#4a6080", fontSize: "11px", marginTop: "6px" },
+});
+
+const EmptyState = styled(Box)({ textAlign: "center", padding: "48px 20px", color: "#3a5070" });
+
+const UserPill = styled(Box)({
+  display: "flex", alignItems: "center", gap: "8px", padding: "6px 14px",
+  backgroundColor: "rgba(15,184,166,0.08)", borderRadius: "20px",
+  border: "1px solid rgba(15,184,166,0.15)", color: "#6a8aaa", fontSize: "13px",
+});
+
+const LogoutButton = styled(Button)({
+  borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px",
+  borderColor: "rgba(248,113,113,0.30)", color: "#f87171", backgroundColor: "rgba(248,113,113,0.08)",
+  "&:hover": { backgroundColor: "#f87171", color: "white", borderColor: "#f87171", boxShadow: "0 4px 12px rgba(248,113,113,0.35)" },
+});
+
+export default function Licenses() {
+  const [licenses, setLicenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editLicense, setEditLicense] = useState(null);
+  const [newExpiryDate, setNewExpiryDate] = useState("");
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({ licenseKey: "", doctorName: "", phone: "", expiryDate: "" });
+
+  useEffect(() => { loadLicenses(); }, []);
+
+  const loadLicenses = async () => {
+    try {
+      setLoading(true); setError(null);
+      const data = await getAllLicenses();
+      setLicenses(data);
+    } catch (err) {
+      console.error("Failed to load licenses:", err);
+      setError("Failed to load licenses. Check console for details.");
+    } finally { setLoading(false); }
+  };
+
+  const handleCreate = async () => {
+    if (!formData.licenseKey || !formData.doctorName || !formData.expiryDate) {
+      setError("Please fill all required fields"); return;
+    }
+    try {
+      setError(null);
+      await createLicense(formData);
+      setOpenDialog(false);
+      setFormData({ licenseKey: "", doctorName: "", phone: "", expiryDate: "" });
+      loadLicenses();
+    } catch (err) {
+      console.error("Failed to create license:", err);
+      setError("Failed to create license: " + err.message);
+    }
+  };
+
+  const toggleStatus = async (docId, currentStatus) => {
+    try {
+      const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+      await updateLicenseStatus(docId, newStatus);
+      loadLicenses();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      setError("Failed to update license status");
+    }
+  };
+
+  const handleEditOpen = (lic) => {
+    setEditLicense(lic);
+    setNewExpiryDate(lic.expiryDate || "");
+    setEditDialogOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!newExpiryDate || !editLicense) return;
+    try {
+      setError(null);
+      await updateLicenseExpiry(editLicense.id, newExpiryDate);
+      setEditDialogOpen(false);
+      loadLicenses();
+    } catch (err) {
+      console.error("Failed to update expiry:", err);
+      setError("Failed to update expiry: " + err.message);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("clinic_admin_logged");
+    localStorage.removeItem("clinic_admin_user");
+    window.location.href = "/login";
+  };
+
+  if (loading) {
+    return (
+      <PageContainer sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <CircularProgress sx={{ color: "#0fb8a6" }} size={48} thickness={3} />
+      </PageContainer>
+    );
+  }
+
+  return (
+    <PageContainer>
+      <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(15,184,166,0.05), transparent 70%)", top: -200, right: -200, filter: "blur(60px)", pointerEvents: "none" }} />
+      <Box sx={{ position: "fixed", width: 500, height: 500, background: "radial-gradient(circle, rgba(59,130,246,0.04), transparent 70%)", bottom: -150, left: -150, filter: "blur(60px)", pointerEvents: "none" }} />
+
+      <TopBar>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ width: 40, height: 40, borderRadius: "10px", background: "linear-gradient(135deg, #0fb8a6, #2563eb)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 15px rgba(15,184,166,0.4)" }}>
+            <Typography sx={{ fontSize: "20px" }}>🔑</Typography>
+          </Box>
+          <Box>
+            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "18px", letterSpacing: "0.3px" }}>License Management</Typography>
+            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }}>Smart Clinic Admin Console v4.0</Typography>
+          </Box>
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <UserPill><span>👋</span>{localStorage.getItem("clinic_admin_user") || "Admin"}</UserPill>
+          <LogoutButton variant="outlined" size="small" onClick={handleLogout}>Logout</LogoutButton>
+          <ActionButton variant="primary" size="small" onClick={() => setOpenDialog(true)}>+ New License</ActionButton>
+        </Box>
+      </TopBar>
+
+      <ContentWrapper>
+        {error && (
+          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f87171" } }}>
+            {error}
+          </Alert>
+        )}
+
+        <GlassPanel>
+          <StyledTableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>License Key</TableCell>
+                  <TableCell>Doctor</TableCell>
+                  <TableCell>Phone</TableCell>
+                  <TableCell>Device MAC</TableCell>
+                  <TableCell>Expiry</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell align="right">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {licenses.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <EmptyState>
+                        <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>📋</Typography>
+                        <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No licenses found</Typography>
+                        <Typography sx={{ color: "#283848", fontSize: "13px" }}>Click "+ New License" to create your first license</Typography>
+                      </EmptyState>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  licenses.map((lic) => (
+                    <TableRow key={lic.id}>
+                      <TableCell>
+                        <Typography sx={{ fontFamily: "monospace", color: "#eaf2ff", fontWeight: 600, letterSpacing: "0.5px" }}>{lic.licenseKey}</Typography>
+                      </TableCell>
+                      <TableCell>{lic.doctorName || "—"}</TableCell>
+                      <TableCell>{lic.phone || "—"}</TableCell>
+                      <TableCell>
+                        <Typography sx={{ fontFamily: "monospace", color: lic.deviceId ? "#34d399" : "#6a8aaa", fontSize: "12px" }}>
+                          {lic.deviceId || "Not bound"}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>{lic.expiryDate}</TableCell>
+                      <TableCell>
+                        <StatusBadge
+                          status={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
+                          label={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
+                          onClick={() => lic.status !== "EXPIRED" && toggleStatus(lic.id, lic.status)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell align="right">
+                        <ActionButton variant="warning" size="small" onClick={() => handleEditOpen(lic)} sx={{ mr: 1 }}>
+                          Edit Expiry
+                        </ActionButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+        </GlassPanel>
+      </ContentWrapper>
+
+      {/* Create Dialog */}
+      <StyledDialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Create New License</DialogTitle>
+        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+          <StyledDialogField fullWidth label="License Key *" margin="normal" value={formData.licenseKey} onChange={(e) => setFormData({ ...formData, licenseKey: e.target.value })} helperText="Use a unique key (e.g., LIC-2026-001)" placeholder="LIC-2026-001" />
+          <StyledDialogField fullWidth label="Doctor Name *" margin="normal" value={formData.doctorName} onChange={(e) => setFormData({ ...formData, doctorName: e.target.value })} />
+          <StyledDialogField fullWidth label="Phone" margin="normal" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="010xxxxxxxx" />
+          <StyledDialogField fullWidth label="Expiry Date *" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={formData.expiryDate} onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })} />
+          <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
+            <ActionButton variant="secondary" onClick={() => { setOpenDialog(false); setError(null); }}>Cancel</ActionButton>
+            <ActionButton variant="primary" onClick={handleCreate}>Create License</ActionButton>
+          </Box>
+        </DialogContent>
+      </StyledDialog>
+
+      {/* Edit Expiry Dialog */}
+      <StyledDialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit License Expiry</DialogTitle>
+        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+          <Typography sx={{ color: "#6a8aaa", mb: 2 }}>License: {editLicense?.licenseKey}</Typography>
+          <Typography sx={{ color: "#6a8aaa", mb: 2 }}>Doctor: {editLicense?.doctorName}</Typography>
+          <StyledDialogField fullWidth label="New Expiry Date *" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={newExpiryDate} onChange={(e) => setNewExpiryDate(e.target.value)} />
+          <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
+            <ActionButton variant="secondary" onClick={() => setEditDialogOpen(false)}>Cancel</ActionButton>
+            <ActionButton variant="primary" onClick={handleEditSave}>Save Changes</ActionButton>
+          </Box>
+        </DialogContent>
+      </StyledDialog>
+    </PageContainer>
+  );
+}
