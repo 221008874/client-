@@ -35,6 +35,7 @@ export default function AdminRegister() {
   const [formData, setFormData] = useState({
     email: '',
     fullName: '',
+     password: '', 
     otp: '',
   });
 
@@ -53,7 +54,10 @@ export default function AdminRegister() {
       const res = await fetch('/api/admin/register-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email }),
+        body: JSON.stringify({ 
+  email: formData.email,
+  password: formData.password  // ← Send password to backend
+}),
       });
       
       const data = await res.json();
@@ -167,6 +171,23 @@ export default function AdminRegister() {
                 },
               }}
             />
+            <StyledTextField
+  label="Password *"
+  type="password"
+  value={formData.password}
+  onChange={handleChange('password')}
+  required
+  disabled={loading}
+  fullWidth
+  sx={{
+    '& .MuiOutlinedInput-root': {
+      backgroundColor: '#0f1e36',
+      borderRadius: '10px',
+      color: '#dde6f0',
+    },
+  }}
+  helperText="Min 8 characters"
+/>
             <Button
               type="submit"
               variant="contained"

@@ -3,17 +3,32 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
 // 🔹 Initialize Firebase Admin (singleton)
+// 🔹 Initialize Firebase Admin (with better error handling)
 if (!getApps().length) {
   try {
-    const serviceAccount = JSON.parse(
-      Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_JSON_BASE64, 'base64').toString()
-    );
+    const base64Key = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_BASE64;
+    
+    if (!base64Key || base64Key.length < 50) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON_BASE64 is missing or too short');
+    }
+    
+    // Decode base64 → string → JSON
+    const decoded = Buffer.from(base64Key, 'base64').toString('utf-8');
+    const serviceAccount = JSON.parse(decoded);
+    
+    // Validate required fields
+    if (!serviceAccount.project_id || !serviceAccount.private_key) {
+      throw new Error('Service account JSON is missing required fields');
+    }
+    
     initializeApp({ credential: cert(serviceAccount) });
+    console.log('✅ Firebase Admin initialized');
+    
   } catch (err) {
-    console.error('Firebase Admin init failed:', err.message);
+    console.error('❌ Firebase Admin init failed:', err.message);
+    // Don't crash the function - let it fail gracefully on first use
   }
 }
-
 const db = getFirestore();
 const auth = getAuth();
 
@@ -67,13 +82,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid verification code' });
     }
 
-    // ✅ Create Firebase Auth user
     const userRecord = await auth.createUser({
-      email: normalizedEmail,
-      displayName: fullName,
-      emailVerified: false,
-      disabled: false,
-    });
+  email: normalizedEmail,
+  password: req.body.password,  // ← ADD THIS (from request body)
+  displayName: fullName,
+  emailVerified: false,
+  disabled: false,
+});
 
     // 🔑 Set admin custom claim
     await auth.setCustomUserClaims(userRecord.uid, { admin: true });
