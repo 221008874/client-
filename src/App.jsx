@@ -58,7 +58,7 @@ export default function App() {
       <Routes>
         {/* Public */}
         <Route path="/login" element={<Login />} />
-
+        <Route path="/register" element={<AdminRegister />} />
         {/* Protected — all share the sidebar layout */}
         <Route
           element={
