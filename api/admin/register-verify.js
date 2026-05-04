@@ -1,5 +1,5 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
 // ─── Initialize Firebase Admin ─────────────────────────────────────────────
@@ -124,7 +124,26 @@ export default async function handler(req, res) {
     // ─── 7. Set admin custom claim ───────────────────────────────────────
     await auth.setCustomUserClaims(userRecord.uid, { admin: true });
 
-    // ─── 8. Store admin profile in Firestore ──────────────────────────────
+    // ─── 8. Add UID to saas_settings/config for Firestore rules ──────────
+    const settingsRef = db.collection('saas_settings').doc('config');
+    try {
+      const settingsDoc = await settingsRef.get();
+      if (settingsDoc.exists) {
+        await settingsRef.update({
+          adminUids: FieldValue.arrayUnion(userRecord.uid)
+        });
+      } else {
+        await settingsRef.set({
+          adminUids: [userRecord.uid],
+          createdAt: new Date().toISOString()
+        });
+      }
+    } catch (settingsError) {
+      console.error('Warning: Could not update saas_settings:', settingsError.message);
+      // Don't fail registration if settings update fails
+    }
+
+    // ─── 9. Store admin profile in Firestore ─────────────────────────────
     await db.collection('admins').doc(userRecord.uid).set({
       email: userEmail,
       fullName: fullName,
@@ -133,7 +152,7 @@ export default async function handler(req, res) {
       uid: userRecord.uid,
     });
 
-    // ─── 9. Clean up OTP document ────────────────────────────────────────
+    // ─── 10. Clean up OTP document ───────────────────────────────────────
     await otpDocRef.delete();
 
     console.log('✅ Admin created:', userRecord.uid);
