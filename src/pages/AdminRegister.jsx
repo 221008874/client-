@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Box, Typography, TextField, Button, Alert, CircularProgress,
   Stepper, Step, StepLabel, Paper
@@ -26,7 +26,6 @@ const RegisterCard = styled(Paper)({
   padding: '32px',
 });
 
-// ✅ FIXED: Added missing StyledTextField definition
 const StyledTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
     backgroundColor: '#0f1e36',
@@ -80,7 +79,21 @@ const RegisterButton = styled(Button)({
   },
 });
 
-// ─── Main Component ──────────────────────────────────────────────────────
+const BackLink = styled(Link)({
+  color: '#0fb8a6',
+  textDecoration: 'none',
+  fontWeight: 600,
+  fontSize: '13px',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '4px',
+  '&:hover': {
+    color: '#2dd4bf',
+    textDecoration: 'underline',
+  },
+});
+
+// ─── Main Component ────────────────────────────────────────────────────
 
 export default function AdminRegister() {
   const navigate = useNavigate();
@@ -92,7 +105,7 @@ export default function AdminRegister() {
   const [formData, setFormData] = useState({
     email: '',
     fullName: '',
-    password: '', 
+    password: '',
     otp: '',
   });
 
@@ -107,6 +120,12 @@ export default function AdminRegister() {
     setLoading(true);
     setError(null);
 
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch('/api/admin/register-request', {
         method: 'POST',
@@ -117,11 +136,18 @@ export default function AdminRegister() {
         }),
       });
       
+      // Defensive JSON parsing
+      const contentType = res.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        const text = await res.text();
+        throw new Error(`Server error ${res.status}: ${text.substring(0, 100)}`);
+      }
+
       const data = await res.json();
       
       if (!res.ok) throw new Error(data.error || 'Failed to send code');
       
-      setSuccess('Verification code sent! Check your email.');
+      setSuccess('Verification request sent to administrator.');
       setStep(2);
     } catch (err) {
       setError(err.message);
@@ -131,49 +157,50 @@ export default function AdminRegister() {
   };
 
   // Step 2: Verify OTP & Register
- const handleVerifyAndRegister = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError(null);
+  const handleVerifyAndRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-  try {
-    const res = await fetch('/api/admin/register-verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: formData.email,
-        otp: formData.otp,
-        fullName: formData.fullName,
-        password: formData.password,
-      }),
-    });
-
-    // ✅ DEFENSIVE: Check if response is actually JSON
-    const contentType = res.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await res.text();
-      console.error('Non-JSON response:', text.substring(0, 200));
-      throw new Error(`Server error ${res.status}: API returned HTML instead of JSON. Is /api/admin/register-verify.js deployed?`);
-    }
-
-    const data = await res.json();
-    
-    if (!res.ok) throw new Error(data.error || 'Registration failed');
-    
-    setSuccess('✅ Admin account created! Redirecting...');
-    
-    setTimeout(() => {
-      navigate('/login', { 
-        state: { message: 'Account created! Please sign in with your new credentials.' }
+    try {
+      const res = await fetch('/api/admin/register-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          otp: formData.otp,
+          fullName: formData.fullName,
+          password: formData.password,
+        }),
       });
-    }, 2000);
-    
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      
+      // Defensive JSON parsing
+      const contentType = res.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        const text = await res.text();
+        throw new Error(`Server error ${res.status}: ${text.substring(0, 100)}`);
+      }
+
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      
+      setSuccess('✅ Admin account created! Redirecting...');
+      
+      setTimeout(() => {
+        navigate('/login', { 
+          state: { 
+            message: 'Account created! Please sign in with your new credentials.' 
+          } 
+        });
+      }, 2000);
+      
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <RegisterWrapper>
@@ -186,8 +213,8 @@ export default function AdminRegister() {
         </Typography>
 
         <Stepper activeStep={step - 1} sx={{ mb: 4 }}>
-          <Step><StepLabel>Request Code</StepLabel></Step>
-          <Step><StepLabel>Verify & Register</StepLabel></Step>
+          <Step><StepLabel>Enter Details</StepLabel></Step>
+          <Step><StepLabel>Verify Code</StepLabel></Step>
         </Stepper>
 
         {error && (
@@ -199,7 +226,7 @@ export default function AdminRegister() {
           <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>
         )}
 
-        {/* Step 1: Email + Name + Password */}
+        {/* Step 1 */}
         {step === 1 && (
           <form onSubmit={handleRequestOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <StyledTextField
@@ -232,29 +259,20 @@ export default function AdminRegister() {
               placeholder="Min 6 characters"
               helperText="Use a strong password"
             />
-            <RegisterButton
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Send Verification Code'}
+            <RegisterButton type="submit" disabled={loading}>
+              {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Request Admin Access'}
             </RegisterButton>
             <Box sx={{ textAlign: 'center', mt: 1 }}>
-              <Button
-                variant="text"
-                onClick={() => navigate('/login')}
-                sx={{ color: '#0fb8a6', fontWeight: 600, fontSize: '13px' }}
-              >
-                ← Back to Login
-              </Button>
+              <BackLink to="/login">← Back to Login</BackLink>
             </Box>
           </form>
         )}
 
-        {/* Step 2: OTP Input */}
+        {/* Step 2 */}
         {step === 2 && (
           <form onSubmit={handleVerifyAndRegister} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <Typography sx={{ color: '#dde6f0', mb: 1 }}>
-              Enter the 6-digit code sent to <strong>{formData.email}</strong>
+              Enter the 6-digit code sent to administrator
             </Typography>
             
             <StyledTextField
@@ -272,25 +290,22 @@ export default function AdminRegister() {
               fullWidth
             />
             
-            <RegisterButton
-              type="submit"
-              disabled={loading}
-            >
+            <RegisterButton type="submit" disabled={loading}>
               {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Verify & Create Account'}
             </RegisterButton>
             
             <Box sx={{ textAlign: 'center', mt: 1 }}>
-              <Button
-                variant="text"
+              <BackLink 
+                component="button" 
+                type="button" 
                 onClick={() => {
                   setStep(1);
                   setFormData(prev => ({ ...prev, otp: '' }));
                   setError(null);
                 }}
-                sx={{ color: '#0fb8a6', fontWeight: 600, fontSize: '13px' }}
               >
                 ← Use different email
-              </Button>
+              </BackLink>
             </Box>
           </form>
         )}

@@ -2,7 +2,7 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
-// ─── Initialize Firebase Admin (singleton) ───────────────────────────────
+// ─── Initialize Firebase Admin ─────────────────────────────────────────────
 
 if (!getApps().length) {
   try {
@@ -41,7 +41,7 @@ async function hashOtp(otp) {
     .join('');
 }
 
-// ─── Main Handler ────────────────────────────────────────────────────────
+// ─── Main Handler ─────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
   // CORS preflight
@@ -58,14 +58,14 @@ export default async function handler(req, res) {
   }
 
   const { email, otp, fullName, password } = req.body;
-  const normalizedEmail = email?.toLowerCase().trim();
+  const userEmail = email?.toLowerCase().trim();
 
   // Validation
-  if (!normalizedEmail || !otp || !fullName || !password) {
+  if (!userEmail || !otp || !fullName || !password) {
     return res.status(400).json({ error: 'Email, OTP, full name, and password are required' });
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) {
     return res.status(400).json({ error: 'Invalid email format' });
   }
 
@@ -74,8 +74,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // ─── 1. Retrieve stored OTP ─────────────────────────────────────────
-    const otpDocRef = db.collection('saas_otp_requests').doc(normalizedEmail);
+    // ─── 1. Retrieve stored OTP by USER'S email ─────────────────────────
+    const otpDocRef = db.collection('saas_otp_requests').doc(userEmail);
     const otpDoc = await otpDocRef.get();
     
     if (!otpDoc.exists) {
@@ -84,19 +84,19 @@ export default async function handler(req, res) {
 
     const otpData = otpDoc.data();
     
-    // ─── 2. Check expiry ──────────────────────────────────────────────────
+    // ─── 2. Check expiry ─────────────────────────────────────────────────
     if (new Date() > new Date(otpData.expiry)) {
-      await otpDocRef.delete(); // Clean up expired
+      await otpDocRef.delete();
       return res.status(400).json({ error: 'Verification code expired. Please request a new one.' });
     }
 
-    // ─── 3. Check attempts ──────────────────────────────────────────────
+    // ─── 3. Check attempts ───────────────────────────────────────────────
     if (otpData.attempts >= 5) {
-      await otpDocRef.delete(); // Clean up after max attempts
+      await otpDocRef.delete();
       return res.status(400).json({ error: 'Too many failed attempts. Please request a new code.' });
     }
 
-    // ─── 4. Verify OTP hash ─────────────────────────────────────────────
+    // ─── 4. Verify OTP hash ──────────────────────────────────────────────
     const inputHash = await hashOtp(otp);
     if (inputHash !== otpData.otpHash) {
       await otpDocRef.update({ attempts: (otpData.attempts || 0) + 1 });
@@ -105,36 +105,35 @@ export default async function handler(req, res) {
 
     // ─── 5. Check if email already exists ────────────────────────────────
     try {
-      const existingUser = await auth.getUserByEmail(normalizedEmail);
+      const existingUser = await auth.getUserByEmail(userEmail);
       if (existingUser) {
         return res.status(400).json({ error: 'This email is already registered' });
       }
     } catch (e) {
       if (e.code !== 'auth/user-not-found') throw e;
-      // User not found = good, we can create
     }
 
-    // ─── 6. Create Firebase user ────────────────────────────────────────
+    // ─── 6. Create Firebase user ─────────────────────────────────────────
     const userRecord = await auth.createUser({
-      email: normalizedEmail,
+      email: userEmail,
       password: password,
       displayName: fullName,
       emailVerified: true,
     });
 
-    // ─── 7. Set admin custom claim ──────────────────────────────────────
+    // ─── 7. Set admin custom claim ───────────────────────────────────────
     await auth.setCustomUserClaims(userRecord.uid, { admin: true });
 
-    // ─── 8. Store admin profile in Firestore ─────────────────────────────
+    // ─── 8. Store admin profile in Firestore ──────────────────────────────
     await db.collection('admins').doc(userRecord.uid).set({
-      email: normalizedEmail,
+      email: userEmail,
       fullName: fullName,
       createdAt: new Date().toISOString(),
       role: 'admin',
       uid: userRecord.uid,
     });
 
-    // ─── 9. Clean up OTP document ───────────────────────────────────────
+    // ─── 9. Clean up OTP document ────────────────────────────────────────
     await otpDocRef.delete();
 
     console.log('✅ Admin created:', userRecord.uid);
@@ -152,7 +151,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'This email is already registered' });
     }
     if (error.code === 'auth/invalid-password') {
-      return res.status(400).json({ error: 'Password is too weak' });
+      return res.status(400).json({ error: 'Password is too weak. Use at least 6 characters.' });
     }
     
     return res.status(500).json({ error: 'Failed to create account. Please try again.' });
