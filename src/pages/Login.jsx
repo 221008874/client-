@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // ← Added Link
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import {
@@ -138,6 +138,22 @@ const LoginButton = styled(Button)({
   },
 });
 
+// ← NEW: Styled link for registration
+const RegisterLink = styled(Link)({
+  color: "#0fb8a6",
+  textDecoration: "none",
+  fontWeight: 600,
+  fontSize: "13px",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "4px",
+  transition: "all 0.2s ease",
+  "&:hover": {
+    color: "#2dd4bf",
+    textDecoration: "underline",
+  },
+});
+
 const SecurityIndicator = styled(Box)({
   display: "flex",
   alignItems: "center",
@@ -156,12 +172,6 @@ const StatusDot = styled(Box)({
   boxShadow: "0 0 8px rgba(52,211,153,0.6)",
 });
 
-
-
-// ... [all your styled components stay exactly the same] ...
-// (pulseRing, LoginWrapper, BgCircle, LoginCard, CardHeader, LogoRing, 
-//  StyledTextField, LoginButton, SecurityIndicator, StatusDot)
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -175,19 +185,11 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. Sign in with email/password
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // 2. 🔑 CRITICAL: Force token refresh to get latest custom claims
-      await userCredential.user.getIdToken(true); // true = force refresh
-      
-      // 3. Optional debug logging (remove in production)
+      await userCredential.user.getIdToken(true);
       const tokenClaims = await userCredential.user.getIdTokenResult();
       console.log("🎫 Token claims:", tokenClaims.claims);
-      
-      // 4. Navigate to dashboard
       navigate("/");
-      
     } catch (err) {
       console.error("Login error:", err);
       setError(
@@ -199,9 +201,6 @@ export default function Login() {
       setLoading(false);
     }
   };
-
-  
-
 
   return (
     <LoginWrapper>
@@ -270,6 +269,23 @@ export default function Login() {
               {loading ? <CircularProgress size={22} sx={{ color: "white" }} /> : "Sign In to Dashboard"}
             </LoginButton>
           </form>
+
+          {/* ← NEW: Registration Link Section */}
+          <Box sx={{ 
+            display: "flex", 
+            flexDirection: "column", 
+            alignItems: "center", 
+            gap: 1,
+            pt: 2,
+            borderTop: "1px solid rgba(15,184,166,0.1)"
+          }}>
+            <Typography sx={{ color: "#4a6080", fontSize: "12px" }}>
+              Don't have an admin account?
+            </Typography>
+            <RegisterLink to="/register">
+              Register as Admin →
+            </RegisterLink>
+          </Box>
 
           <SecurityIndicator>
             <StatusDot />
