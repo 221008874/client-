@@ -131,43 +131,49 @@ export default function AdminRegister() {
   };
 
   // Step 2: Verify OTP & Register
-  const handleVerifyAndRegister = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+ const handleVerifyAndRegister = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
 
-    try {
-      const res = await fetch('/api/admin/register-verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          otp: formData.otp,
-          fullName: formData.fullName,
-          password: formData.password,
-        }),
-      });
-      
-      const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
-      
-      setSuccess('✅ Admin account created! Redirecting...');
-      
-      setTimeout(() => {
-        navigate('/login', { 
-          state: { 
-            message: 'Account created! Please sign in with your new admin credentials.' 
-          } 
-        });
-      }, 2000);
-      
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  try {
+    const res = await fetch('/api/admin/register-verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: formData.email,
+        otp: formData.otp,
+        fullName: formData.fullName,
+        password: formData.password,
+      }),
+    });
+
+    // ✅ DEFENSIVE: Check if response is actually JSON
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await res.text();
+      console.error('Non-JSON response:', text.substring(0, 200));
+      throw new Error(`Server error ${res.status}: API returned HTML instead of JSON. Is /api/admin/register-verify.js deployed?`);
     }
-  };
+
+    const data = await res.json();
+    
+    if (!res.ok) throw new Error(data.error || 'Registration failed');
+    
+    setSuccess('✅ Admin account created! Redirecting...');
+    
+    setTimeout(() => {
+      navigate('/login', { 
+        state: { message: 'Account created! Please sign in with your new credentials.' }
+      });
+    }, 2000);
+    
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <RegisterWrapper>
