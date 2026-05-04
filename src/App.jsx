@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
-
+import AdminRegister from "./pages/AdminRegister";
 // Pages
 import Licenses from "./pages/Licenses";
 import Tenants  from "./pages/Tenants";
