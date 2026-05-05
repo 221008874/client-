@@ -54,7 +54,39 @@ function buildPublicDoctor(data, doctorId) {
     _sourceId: doctorId,
   };
 }
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 
+export const createDoctorWithAuth = async (doctorData) => {
+  const auth = getAuth();
+  
+  // 1. Create the doctor profile (existing dual-write)
+  const doctorId = await createDoctor(doctorData);
+  
+  // 2. Create Firebase Auth account
+  if (doctorData.email && doctorData.password) {
+    try {
+      const userCred = await createUserWithEmailAndPassword(
+        auth, 
+        doctorData.email, 
+        doctorData.password
+      );
+      
+      // 3. Create mapping in comm_doctor_users
+      await setDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email), {
+        doctorId: doctorId,
+        email: doctorData.email,
+        createdAt: serverTimestamp(),
+      });
+      
+      console.log('Doctor auth account created:', userCred.user.uid);
+    } catch (e) {
+      console.error('Failed to create auth account:', e);
+      // Don't fail the whole operation — auth can be set up later
+    }
+  }
+  
+  return doctorId;
+};
 function buildPublicTenant(data, tenantId) {
   return {
     id: tenantId,
