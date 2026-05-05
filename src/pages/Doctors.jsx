@@ -7,15 +7,16 @@ import {
   updateDoctorStatus,
   deleteDoctor,
 } from "../services/firestoreService";
+import { uploadImageToCloudinary } from "../lib/cloudinary";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
-  Select, MenuItem, FormControl, InputLabel, Autocomplete,
+  Select, MenuItem, FormControl, InputLabel,
   CircularProgress, Alert, Box, Typography, Chip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-// ─── Shared Styled Components (same dark teal system) ─────────────────────────
+// ─── Shared Styled Components ─────────────────────────────────────────────
 
 const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#04091a", marginLeft: 220, position: "relative", overflow: "hidden" });
 
@@ -84,11 +85,114 @@ const StatCard = styled(Box)({
 
 const EmptyState = styled(Box)({ textAlign: "center", padding: "48px 20px" });
 
-const BLANK = { name: "", phone: "", email: "", specialization: "", tenantId: "", tenantName: "", licenseKey: "" };
+const BLANK = { name: "", phone: "", email: "", specialization: "", tenantId: "", tenantName: "", licenseKey: "", photoUrl: "" };
 
 const SPECIALIZATIONS = ["General Practice", "Internal Medicine", "Pediatrics", "Cardiology", "Dermatology", "Orthopedics", "Neurology", "Ophthalmology", "ENT", "Psychiatry", "Other"];
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─── Image Upload Component ───────────────────────────────────────────────
+
+function ImageUploadField({ obj, set, error, setError }) {
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState(obj.photoUrl || "");
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError && setError("Please select an image file (JPG, PNG, WebP)");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError && setError("Image must be under 5MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => setPreview(reader.result);
+    reader.readAsDataURL(file);
+
+    try {
+      setUploading(true);
+      setError && setError(null);
+      const url = await uploadImageToCloudinary(file, "doctors/profiles");
+      set(p => ({ ...p, photoUrl: url }));
+      setPreview(url);
+    } catch (err) {
+      setError && setError("Image upload failed: " + err.message);
+      setPreview(obj.photoUrl || "");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const clearPhoto = () => {
+    setPreview("");
+    set(p => ({ ...p, photoUrl: "" }));
+  };
+
+  return (
+    <Box sx={{ mt: 2, mb: 1 }}>
+      <Typography sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, mb: 1 }}>
+        Profile Photo
+      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        {preview ? (
+          <Box sx={{ position: "relative" }}>
+            <img 
+              src={preview} 
+              alt="Preview" 
+              style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(15,184,166,0.3)" }} 
+            />
+            <button
+              onClick={clearPhoto}
+              style={{ 
+                position: "absolute", top: -4, right: -4, 
+                background: "#f87171", color: "white", border: "none", 
+                borderRadius: "50%", width: 22, height: 22, 
+                cursor: "pointer", fontSize: 12, display: "flex", 
+                alignItems: "center", justifyContent: "center" 
+              }}
+              type="button"
+            >×</button>
+          </Box>
+        ) : (
+          <Box sx={{ 
+            width: 80, height: 80, borderRadius: "50%", 
+            backgroundColor: "#0f1e36", border: "2px dashed rgba(15,184,166,0.2)", 
+            display: "flex", alignItems: "center", justifyContent: "center", 
+            color: "#4a6080", fontSize: 24 
+          }}>
+            👤
+          </Box>
+        )}
+        <Box>
+          <Button
+            component="label"
+            variant="outlined"
+            disabled={uploading}
+            sx={{ 
+              borderColor: "rgba(15,184,166,0.3)", color: "#2dd4bf", 
+              textTransform: "none", fontSize: "12px",
+              "&:hover": { borderColor: "#0fb8a6", backgroundColor: "rgba(15,184,166,0.08)" }
+            }}
+          >
+            {uploading ? (
+              <CircularProgress size={14} sx={{ color: "#0fb8a6", mr: 1 }} thickness={5} />
+            ) : null}
+            {uploading ? "Uploading..." : preview ? "Change Photo" : "Upload Photo"}
+            <input type="file" accept="image/*" hidden onChange={handleFileChange} />
+          </Button>
+          <Typography sx={{ color: "#4a6080", fontSize: "11px", mt: 0.5 }}>
+            JPG, PNG, WebP. Max 5MB.
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+// ─── Component ───────────────────────────────────────────────────────────
 
 export default function Doctors() {
   const [doctors,  setDoctors]  = useState([]);
@@ -114,7 +218,7 @@ export default function Doctors() {
     finally { setLoading(false); }
   };
 
-  // ── Create ────────────────────────────────────────────────────────────────
+  // ── Create ──────────────────────────────────────────────────────────────
   const handleCreate = async () => {
     if (!formData.name || !formData.tenantId) { setError("Doctor name and tenant are required"); return; }
     try {
@@ -124,10 +228,19 @@ export default function Doctors() {
     } catch (e) { setError("Failed to create doctor: " + e.message); }
   };
 
-  // ── Edit ─────────────────────────────────────────────────────────────────
+  // ── Edit ────────────────────────────────────────────────────────────────
   const openEdit = (d) => {
     setEditTarget(d);
-    setEditData({ name: d.name || "", phone: d.phone || "", email: d.email || "", specialization: d.specialization || "", tenantId: d.tenantId || "", tenantName: d.tenantName || "", licenseKey: d.licenseKey || "" });
+    setEditData({ 
+      name: d.name || "", 
+      phone: d.phone || "", 
+      email: d.email || "", 
+      specialization: d.specialization || "", 
+      tenantId: d.tenantId || "", 
+      tenantName: d.tenantName || "", 
+      licenseKey: d.licenseKey || "",
+      photoUrl: d.photoUrl || "",
+    });
     setEditOpen(true);
   };
 
@@ -140,23 +253,23 @@ export default function Doctors() {
     } catch (e) { setError("Failed to update doctor: " + e.message); }
   };
 
-  // ── Toggle Status ─────────────────────────────────────────────────────────
+  // ── Toggle Status ───────────────────────────────────────────────────────
   const toggleStatus = async (id, current) => {
     try { await updateDoctorStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE"); load(); }
     catch (e) { setError("Failed to update status"); }
   };
 
-  // ── Delete ────────────────────────────────────────────────────────────────
+  // ── Delete ──────────────────────────────────────────────────────────────
   const handleDelete = async () => {
     if (!deleteConfirm) return;
     try { await deleteDoctor(deleteConfirm.id); setDeleteConfirm(null); load(); }
     catch (e) { setError("Failed to delete doctor: " + e.message); }
   };
 
-  // ── Filter ────────────────────────────────────────────────────────────────
+  // ── Filter ──────────────────────────────────────────────────────────────
   const visible = tenantFilter === "ALL" ? doctors : doctors.filter(d => d.tenantId === tenantFilter);
 
-  // ── Stats ─────────────────────────────────────────────────────────────────
+  // ── Stats ─────────────────────────────────────────────────────────────
   const active = doctors.filter(d => d.status === "ACTIVE").length;
 
   if (loading) {
@@ -206,7 +319,6 @@ export default function Doctors() {
           </Box>
         </Box>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          {/* Tenant filter */}
           <FormControl size="small" sx={{ minWidth: 180 }}>
             <StyledSelect value={tenantFilter} onChange={e => setTenantFilter(e.target.value)} displayEmpty sx={{ height: 38, fontSize: "12px" }}>
               <MenuItem value="ALL" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>All Tenants</MenuItem>
@@ -224,7 +336,6 @@ export default function Doctors() {
           </Alert>
         )}
 
-        {/* Stats */}
         <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
           {[
             { label: "Total Doctors", value: doctors.length, color: "#60a5fa" },
@@ -270,8 +381,19 @@ export default function Doctors() {
                   visible.map(d => (
                     <TableRow key={d.id}>
                       <TableCell>
-                        <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>Dr. {d.name}</Typography>
-                        {d.email && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{d.email}</Typography>}
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                          {d.photoUrl ? (
+                            <img src={d.photoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} />
+                          ) : (
+                            <Box sx={{ width: 32, height: 32, borderRadius: "50%", backgroundColor: "#0f1e36", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#4a6080" }}>
+                              {d.name?.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase() || '?'}
+                            </Box>
+                          )}
+                          <Box>
+                            <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>Dr. {d.name}</Typography>
+                            {d.email && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{d.email}</Typography>}
+                          </Box>
+                        </Box>
                       </TableCell>
                       <TableCell>
                         <Typography sx={{ fontSize: "12px", color: "#9ecfca", backgroundColor: "rgba(15,184,166,0.08)", border: "1px solid rgba(15,184,166,0.12)", borderRadius: 6, px: 1, py: 0.25, display: "inline-block" }}>
@@ -303,10 +425,11 @@ export default function Doctors() {
         </GlassPanel>
       </ContentWrapper>
 
-      {/* ── Create Dialog ────────────────────────────────────────────────────── */}
+      {/* ── Create Dialog ─────────────────────────────────────────────────── */}
       <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Add New Doctor</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+          <ImageUploadField obj={formData} set={setFormData} error={error} setError={setError} />
           {fieldEl("Full Name *", "name", formData, setFormData)}
           <TenantSelect obj={formData} set={setFormData} />
           <SpecSelect obj={formData} set={setFormData} />
@@ -320,10 +443,11 @@ export default function Doctors() {
         </DialogContent>
       </StyledDialog>
 
-      {/* ── Edit Dialog ──────────────────────────────────────────────────────── */}
+      {/* ── Edit Dialog ───────────────────────────────────────────────────── */}
       <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Doctor</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+          <ImageUploadField obj={editData} set={setEditData} error={error} setError={setError} />
           {fieldEl("Full Name *", "name", editData, setEditData)}
           <TenantSelect obj={editData} set={setEditData} />
           <SpecSelect obj={editData} set={setEditData} />
@@ -337,7 +461,7 @@ export default function Doctors() {
         </DialogContent>
       </StyledDialog>
 
-      {/* ── Delete Confirm ────────────────────────────────────────────────────── */}
+      {/* ── Delete Confirm ────────────────────────────────────────────────── */}
       <StyledDialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
