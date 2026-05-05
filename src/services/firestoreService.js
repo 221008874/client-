@@ -1,3 +1,4 @@
+// src/services/firestoreService.js
 import {
   collection,
   getDocs,
@@ -14,118 +15,65 @@ import {
   startAfter,
   getDoc,
 } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 // ─── CRITICAL: db must be from the SAME modular SDK instance ──────────────
 import { db } from "../firebase";
 
 export const COLLECTIONS = {
-  SAAS_TENANTS:      "saas_tenants",
-  SAAS_DOCTORS:      "saas_doctors",
-  SAAS_LICENSES:     "saas_licenses",
-  SAAS_SETTINGS:     "saas_settings",
-  COMM_DOCTORS:      "comm_doctors",
-  COMM_TENANTS:      "comm_tenants",
+  SAAS_TENANTS: "saas_tenants",
+  SAAS_DOCTORS: "saas_doctors",
+  SAAS_LICENSES: "saas_licenses",
+  SAAS_SETTINGS: "saas_settings",
+  COMM_DOCTORS: "comm_doctors",
+  COMM_TENANTS: "comm_tenants",
   COMM_APPOINTMENTS: "comm_appointments",
-  COMM_PATIENTS:     "comm_patients",
-  SYNC_QUEUE:        "sync_queue",
-  SERVERS:           "clinic_servers",
+  COMM_PATIENTS: "comm_patients",
+  COMM_DOCTOR_USERS: "comm_doctor_users", // 🔑 NEW: For doctor auth mapping
+  SYNC_QUEUE: "sync_queue",
+  SERVERS: "clinic_servers",
 };
 
 // ─── PUBLIC-SAFE FIELD BUILDERS ─────────────────────────────────────────────
 function buildPublicDoctor(data, doctorId) {
   return {
-    name: data.name || '',
-    specialty: data.specialization || data.specialty || '',
-    bio: data.bio || '',
-    photoUrl: data.photoUrl || '',
-    tenantId: data.tenantId || data.clinicId || '',
-    clinicName: data.tenantName || data.clinicName || '',
-    city: data.city || '',
-    address: data.address || '',
+    name: data.name || "",
+    specialty: data.specialization || data.specialty || "",
+    bio: data.bio || "",
+    photoUrl: data.photoUrl || "",
+    tenantId: data.tenantId || data.clinicId || "",
+    clinicName: data.tenantName || data.clinicName || "",
+    city: data.city || "",
+    address: data.address || "",
     workingDays: data.workingDays || [],
     timeSlots: data.timeSlots || [],
-    education: data.education || '',
+    education: data.education || "",
     languages: data.languages || [],
     yearsOfExperience: data.yearsOfExperience || null,
-    active: data.status === 'ACTIVE',
-    visibility: data.status === 'ACTIVE' ? 'PUBLIC' : 'HIDDEN',
+    active: data.status === "ACTIVE",
+    visibility: data.status === "ACTIVE" ? "PUBLIC" : "HIDDEN",
     availableToday: false,
-    _syncedAt: new Date().toISOString(),
+    _syncedAt: serverTimestamp(),
     _sourceId: doctorId,
   };
 }
-// Add this import at top if not present:
-import { getAuth, createUserWithEmailAndPassword, updatePassword } from 'firebase/auth';
 
-export const createDoctor = async (doctorData) => {
-  let saasRef;
-  let authUser = null;
-  
-  try {
-    // 1. Write to saas_doctors
-    saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_DOCTORS), {
-      ...doctorData,
-      status: "ACTIVE",
-      createdAt: serverTimestamp(),
-    });
-
-    // 2. Create Firebase Auth account for doctor login
-    if (doctorData.email && doctorData.password) {
-      const auth = getAuth();
-      authUser = await createUserWithEmailAndPassword(
-        auth,
-        doctorData.email,
-        doctorData.password
-      );
-      
-      // 3. Create mapping in comm_doctor_users with firstLogin flag
-      await setDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email), {
-        doctorId: saasRef.id,
-        email: doctorData.email,
-        firstLogin: true,  // 🔑 CRITICAL: Flag for mandatory password change
-        createdAt: serverTimestamp(),
-      });
-    }
-
-    // 4. Mirror to comm_doctors (public-safe)
-    const publicDoctor = buildPublicDoctor(
-      { ...doctorData, status: 'ACTIVE' },
-      saasRef.id
-    );
-    await setDoc(doc(db, COLLECTIONS.COMM_DOCTORS, saasRef.id), publicDoctor);
-
-    // 5. Ensure tenant exists in comm_tenants
-    if (doctorData.tenantId) {
-      const tenantRef = doc(db, COLLECTIONS.COMM_TENANTS, doctorData.tenantId);
-      const tenantSnap = await getDoc(tenantRef);
-      if (!tenantSnap.exists()) {
-        const saasTenantSnap = await getDoc(doc(db, COLLECTIONS.SAAS_TENANTS, doctorData.tenantId));
-        await setDoc(tenantRef, {
-          id: doctorData.tenantId,
-          name: saasTenantSnap.exists() ? saasTenantSnap.data().name : 'Unknown Clinic',
-          active: true,
-          visibility: 'PUBLIC',
-          _syncedAt: serverTimestamp(),
-        });
-      }
-    }
-
-    return saasRef.id;
-  } catch (error) {
-    // 🔥 Rollback: Clean up Auth user if Firestore write failed
-    if (authUser?.user) {
-      await authUser.user.delete().catch(console.error);
-    }
-    // Rollback: Delete from saas_doctors if comm write failed
-    if (saasRef?.id) {
-      await deleteDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, saasRef.id)).catch(console.error);
-    }
-    throw error;
-  }
-};
+function buildPublicTenant(data, tenantId) {
+  return {
+    id: tenantId,
+    name: data.name || data.clinicName || "Unknown Clinic",
+    city: data.city || "",
+    address: data.address || "",
+    logoUrl: data.logoUrl || "",
+    description: data.description || "",
+    active: data.status === "ACTIVE",
+    visibility: data.status === "ACTIVE" ? "PUBLIC" : "HIDDEN",
+    _syncedAt: serverTimestamp(),
+    _sourceId: tenantId,
+  };
+}
 
 // ─── LICENSES ───────────────────────────────────────────────────────────────
-
 export const createLicense = async (licenseData) => {
   const { licenseKey, ...data } = licenseData;
   await setDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey), {
@@ -139,13 +87,18 @@ export const createLicense = async (licenseData) => {
 };
 
 export const getAllLicenses = async () => {
-  const q = query(collection(db, COLLECTIONS.SAAS_LICENSES), orderBy("createdAt", "desc"));
+  const q = query(
+    collection(db, COLLECTIONS.SAAS_LICENSES),
+    orderBy("createdAt", "desc")
+  );
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
 export const updateLicenseStatus = async (docId, newStatus) => {
-  await updateDoc(doc(db, COLLECTIONS.SAAS_LICENSES, docId), { status: newStatus });
+  await updateDoc(doc(db, COLLECTIONS.SAAS_LICENSES, docId), {
+    status: newStatus,
+  });
 };
 
 export const updateLicenseExpiry = async (licenseKey, newExpiryDate) => {
@@ -157,7 +110,6 @@ export const updateLicenseExpiry = async (licenseKey, newExpiryDate) => {
 };
 
 // ─── TENANTS (SaaS + COMM dual-write) ─────────────────────────────────────
-
 export const createTenant = async (tenantData) => {
   // 1. Write to saas_tenants
   const saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_TENANTS), {
@@ -168,7 +120,7 @@ export const createTenant = async (tenantData) => {
 
   // 2. Mirror to comm_tenants
   const publicTenant = buildPublicTenant(
-    { ...tenantData, status: 'ACTIVE' },
+    { ...tenantData, status: "ACTIVE" },
     saasRef.id
   );
   await setDoc(doc(db, COLLECTIONS.COMM_TENANTS, saasRef.id), publicTenant);
@@ -177,20 +129,25 @@ export const createTenant = async (tenantData) => {
 };
 
 export const getAllTenants = async () => {
-  const q = query(collection(db, COLLECTIONS.SAAS_TENANTS), orderBy("createdAt", "desc"));
+  const q = query(
+    collection(db, COLLECTIONS.SAAS_TENANTS),
+    orderBy("createdAt", "desc")
+  );
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
 export const updateTenantStatus = async (tenantId, newStatus) => {
   // 1. Update saas_tenants
-  await updateDoc(doc(db, COLLECTIONS.SAAS_TENANTS, tenantId), { status: newStatus });
+  await updateDoc(doc(db, COLLECTIONS.SAAS_TENANTS, tenantId), {
+    status: newStatus,
+  });
 
   // 2. Sync visibility to comm_tenants
   await updateDoc(doc(db, COLLECTIONS.COMM_TENANTS, tenantId), {
-    active: newStatus === 'ACTIVE',
-    visibility: newStatus === 'ACTIVE' ? 'PUBLIC' : 'HIDDEN',
-    _syncedAt: new Date().toISOString(),
+    active: newStatus === "ACTIVE",
+    visibility: newStatus === "ACTIVE" ? "PUBLIC" : "HIDDEN",
+    _syncedAt: serverTimestamp(),
   });
 };
 
@@ -203,11 +160,18 @@ export const updateTenant = async (tenantId, updates) => {
 
   // 2. Sync allowed fields to comm_tenants
   const publicUpdates = {};
-  ['name', 'clinicName', 'city', 'address', 'logoUrl', 'description'].forEach(f => {
+  [
+    "name",
+    "clinicName",
+    "city",
+    "address",
+    "logoUrl",
+    "description",
+  ].forEach((f) => {
     if (updates[f] !== undefined) publicUpdates[f] = updates[f];
   });
   if (Object.keys(publicUpdates).length > 0) {
-    publicUpdates._syncedAt = new Date().toISOString();
+    publicUpdates._syncedAt = serverTimestamp();
     await updateDoc(doc(db, COLLECTIONS.COMM_TENANTS, tenantId), publicUpdates);
   }
 };
@@ -228,50 +192,105 @@ export const deleteTenant = async (tenantId) => {
   for (const d of doctorsSnap.docs) {
     await updateDoc(d.ref, {
       active: false,
-      visibility: 'HIDDEN',
-      _syncedAt: new Date().toISOString(),
+      visibility: "HIDDEN",
+      _syncedAt: serverTimestamp(),
     });
   }
 };
 
 // ─── DOCTORS (SaaS + COMM dual-write) ─────────────────────────────────────
-
+// 🔑 SINGLE createDoctor function with Firebase Auth integration
 export const createDoctor = async (doctorData) => {
-  // 1. Write to saas_doctors
-  const saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_DOCTORS), {
-    ...doctorData,
-    status: "ACTIVE",
-    createdAt: serverTimestamp(),
-  });
+  let saasRef;
+  let authUser = null;
 
-  // 2. Mirror to comm_doctors (public-safe, stripped)
-  const publicDoctor = buildPublicDoctor(
-    { ...doctorData, status: 'ACTIVE' },
-    saasRef.id
-  );
-  await setDoc(doc(db, COLLECTIONS.COMM_DOCTORS, saasRef.id), publicDoctor);
+  try {
+    // 🔑 Extract password before storing in Firestore (never store passwords in Firestore)
+    const { password, confirmPassword, ...doctorPublicData } = doctorData;
 
-  // 3. Ensure tenant exists in comm_tenants
-  if (doctorData.tenantId) {
-    const tenantSnap = await getDoc(doc(db, COLLECTIONS.COMM_TENANTS, doctorData.tenantId));
-    if (!tenantSnap.exists()) {
-      const saasTenantSnap = await getDoc(doc(db, COLLECTIONS.SAAS_TENANTS, doctorData.tenantId));
-      const tenantName = saasTenantSnap.exists() ? saasTenantSnap.data().name : 'Unknown Clinic';
-      await setDoc(doc(db, COLLECTIONS.COMM_TENANTS, doctorData.tenantId), {
-        id: doctorData.tenantId,
-        name: tenantName,
-        active: true,
-        visibility: 'PUBLIC',
-        _syncedAt: new Date().toISOString(),
-      });
+    // 1. Write to saas_doctors (internal admin data)
+    saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_DOCTORS), {
+      ...doctorPublicData,
+      status: "ACTIVE",
+      createdAt: serverTimestamp(),
+    });
+
+    // 2. Create Firebase Auth account for doctor login (if password provided)
+    if (doctorData.email && password) {
+      const auth = getAuth();
+      authUser = await createUserWithEmailAndPassword(
+        auth,
+        doctorData.email,
+        password
+      );
+
+      // 3. Create mapping in comm_doctor_users with firstLogin flag
+      await setDoc(
+        doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email),
+        {
+          doctorId: saasRef.id,
+          email: doctorData.email,
+          firstLogin: true, // 🔑 CRITICAL: Flag for mandatory password change
+          createdAt: serverTimestamp(),
+        }
+      );
     }
-  }
 
-  return saasRef.id;
+    // 4. Mirror to comm_doctors (public-safe, NO password field)
+    const publicDoctor = buildPublicDoctor(
+      { ...doctorPublicData, status: "ACTIVE" },
+      saasRef.id
+    );
+    await setDoc(
+      doc(db, COLLECTIONS.COMM_DOCTORS, saasRef.id),
+      publicDoctor
+    );
+
+    // 5. Ensure tenant exists in comm_tenants
+    if (doctorData.tenantId) {
+      const tenantRef = doc(
+        db,
+        COLLECTIONS.COMM_TENANTS,
+        doctorData.tenantId
+      );
+      const tenantSnap = await getDoc(tenantRef);
+      if (!tenantSnap.exists()) {
+        const saasTenantSnap = await getDoc(
+          doc(db, COLLECTIONS.SAAS_TENANTS, doctorData.tenantId)
+        );
+        await setDoc(tenantRef, {
+          id: doctorData.tenantId,
+          name: saasTenantSnap.exists()
+            ? saasTenantSnap.data().name
+            : "Unknown Clinic",
+          active: true,
+          visibility: "PUBLIC",
+          _syncedAt: serverTimestamp(),
+        });
+      }
+    }
+
+    return saasRef.id;
+  } catch (error) {
+    // 🔥 Rollback: Clean up Auth user if Firestore write failed
+    if (authUser?.user) {
+      await authUser.user.delete().catch(console.error);
+    }
+    // Rollback: Delete from saas_doctors if comm write failed
+    if (saasRef?.id) {
+      await deleteDoc(
+        doc(db, COLLECTIONS.SAAS_DOCTORS, saasRef.id)
+      ).catch(console.error);
+    }
+    throw error;
+  }
 };
 
 export const getAllDoctors = async () => {
-  const q = query(collection(db, COLLECTIONS.SAAS_DOCTORS), orderBy("createdAt", "desc"));
+  const q = query(
+    collection(db, COLLECTIONS.SAAS_DOCTORS),
+    orderBy("createdAt", "desc")
+  );
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
@@ -299,17 +318,32 @@ export const getDoctorsByTenant = async (tenantId) => {
 
 export const updateDoctorStatus = async (doctorId, newStatus) => {
   // 1. Update saas_doctors
-  await updateDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, doctorId), { status: newStatus });
+  await updateDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, doctorId), {
+    status: newStatus,
+  });
 
   // 2. Sync visibility to comm_doctors
   await updateDoc(doc(db, COLLECTIONS.COMM_DOCTORS, doctorId), {
-    active: newStatus === 'ACTIVE',
-    visibility: newStatus === 'ACTIVE' ? 'PUBLIC' : 'HIDDEN',
-    _syncedAt: new Date().toISOString(),
+    active: newStatus === "ACTIVE",
+    visibility: newStatus === "ACTIVE" ? "PUBLIC" : "HIDDEN",
+    _syncedAt: serverTimestamp(),
   });
 };
 
 export const updateDoctor = async (doctorId, updates) => {
+  // 🔑 If password is being updated, handle Firebase Auth separately
+  if (updates.password) {
+    const auth = getAuth();
+    // Note: Password updates should be done via useDoctorAuth.changePassword()
+    // This is just for admin-initiated password resets
+    console.warn(
+      "Password updates via updateDoctor are deprecated. Use changePassword() instead."
+    );
+    // Remove password from Firestore updates (never store in Firestore)
+    const { password, ...updatesWithoutPassword } = updates;
+    updates = updatesWithoutPassword;
+  }
+
   // 1. Update saas_doctors
   await updateDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, doctorId), {
     ...updates,
@@ -318,17 +352,35 @@ export const updateDoctor = async (doctorId, updates) => {
 
   // 2. Sync allowed fields to comm_doctors
   const publicUpdates = {};
-  ['name', 'specialization', 'specialty', 'bio', 'photoUrl', 'tenantId', 'clinicId',
-   'clinicName', 'tenantName', 'city', 'address', 'workingDays', 'timeSlots',
-   'education', 'languages', 'yearsOfExperience'].forEach(f => {
+  [
+    "name",
+    "specialization",
+    "specialty",
+    "bio",
+    "photoUrl",
+    "tenantId",
+    "clinicId",
+    "clinicName",
+    "tenantName",
+    "city",
+    "address",
+    "workingDays",
+    "timeSlots",
+    "education",
+    "languages",
+    "yearsOfExperience",
+  ].forEach((f) => {
     if (updates[f] !== undefined) publicUpdates[f] = updates[f];
   });
   if (updates.specialization !== undefined) {
     publicUpdates.specialty = updates.specialization;
   }
   if (Object.keys(publicUpdates).length > 0) {
-    publicUpdates._syncedAt = new Date().toISOString();
-    await updateDoc(doc(db, COLLECTIONS.COMM_DOCTORS, doctorId), publicUpdates);
+    publicUpdates._syncedAt = serverTimestamp();
+    await updateDoc(
+      doc(db, COLLECTIONS.COMM_DOCTORS, doctorId),
+      publicUpdates
+    );
   }
 };
 
@@ -341,7 +393,6 @@ export const deleteDoctor = async (doctorId) => {
 };
 
 // ─── PATIENTS & APPOINTMENTS ────────────────────────────────────────────────
-
 export const createPatient = async (patientData) => {
   const { phone, ...data } = patientData;
   await setDoc(doc(db, COLLECTIONS.COMM_PATIENTS, phone), {
@@ -370,7 +421,10 @@ export const createAppointment = async (appointmentData) => {
   return ref.id;
 };
 
-export const getAppointmentsByPatient = async (patientPhone, tenantId = null) => {
+export const getAppointmentsByPatient = async (
+  patientPhone,
+  tenantId = null
+) => {
   let q = query(
     collection(db, COLLECTIONS.COMM_APPOINTMENTS),
     where("patientPhone", "==", patientPhone),
@@ -383,7 +437,12 @@ export const getAppointmentsByPatient = async (patientPhone, tenantId = null) =>
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
-export const getUnsyncedAppointments = async ({ licenseKey, tenantId, lastDoc = null, batchSize = 100 }) => {
+export const getUnsyncedAppointments = async ({
+  licenseKey,
+  tenantId,
+  lastDoc = null,
+  batchSize = 100,
+}) => {
   let q = query(
     collection(db, COLLECTIONS.COMM_APPOINTMENTS),
     where("synced", "==", false),
@@ -400,14 +459,22 @@ export const getUnsyncedAppointments = async ({ licenseKey, tenantId, lastDoc = 
   const snapshot = await getDocs(q);
   return {
     docs: snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-    lastDoc: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
+    lastDoc:
+      snapshot.docs.length > 0
+        ? snapshot.docs[snapshot.docs.length - 1]
+        : null,
     hasMore: snapshot.docs.length === batchSize,
   };
 };
 
 // ─── SYNC QUEUE ─────────────────────────────────────────────────────────────
-
-export const queueSyncAppointment = async ({ licenseKey, tenantId, appointmentId, patientPhone, doctorId }) => {
+export const queueSyncAppointment = async ({
+  licenseKey,
+  tenantId,
+  appointmentId,
+  patientPhone,
+  doctorId,
+}) => {
   await addDoc(collection(db, COLLECTIONS.SYNC_QUEUE), {
     licenseKey,
     tenantId,
@@ -448,8 +515,14 @@ export const markSyncFailed = async (queueItemId, error, retryCount) => {
 };
 
 // ─── SERVER REGISTRATION ──────────────────────────────────────────────────
-
-export const registerClinicServer = async ({ macAddress, licenseKey, tunnelUrl, localIp, port, version }) => {
+export const registerClinicServer = async ({
+  macAddress,
+  licenseKey,
+  tunnelUrl,
+  localIp,
+  port,
+  version,
+}) => {
   await setDoc(doc(db, COLLECTIONS.SERVERS, macAddress), {
     macAddress,
     licenseKey,
