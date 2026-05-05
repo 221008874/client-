@@ -54,53 +54,75 @@ function buildPublicDoctor(data, doctorId) {
     _sourceId: doctorId,
   };
 }
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+// Add this import at top if not present:
+import { getAuth, createUserWithEmailAndPassword, updatePassword } from 'firebase/auth';
 
-export const createDoctorWithAuth = async (doctorData) => {
-  const auth = getAuth();
+export const createDoctor = async (doctorData) => {
+  let saasRef;
+  let authUser = null;
   
-  // 1. Create the doctor profile (existing dual-write)
-  const doctorId = await createDoctor(doctorData);
-  
-  // 2. Create Firebase Auth account
-  if (doctorData.email && doctorData.password) {
-    try {
-      const userCred = await createUserWithEmailAndPassword(
-        auth, 
-        doctorData.email, 
+  try {
+    // 1. Write to saas_doctors
+    saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_DOCTORS), {
+      ...doctorData,
+      status: "ACTIVE",
+      createdAt: serverTimestamp(),
+    });
+
+    // 2. Create Firebase Auth account for doctor login
+    if (doctorData.email && doctorData.password) {
+      const auth = getAuth();
+      authUser = await createUserWithEmailAndPassword(
+        auth,
+        doctorData.email,
         doctorData.password
       );
       
-      // 3. Create mapping in comm_doctor_users
+      // 3. Create mapping in comm_doctor_users with firstLogin flag
       await setDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email), {
-        doctorId: doctorId,
+        doctorId: saasRef.id,
         email: doctorData.email,
+        firstLogin: true,  // 🔑 CRITICAL: Flag for mandatory password change
         createdAt: serverTimestamp(),
       });
-      
-      console.log('Doctor auth account created:', userCred.user.uid);
-    } catch (e) {
-      console.error('Failed to create auth account:', e);
-      // Don't fail the whole operation — auth can be set up later
     }
+
+    // 4. Mirror to comm_doctors (public-safe)
+    const publicDoctor = buildPublicDoctor(
+      { ...doctorData, status: 'ACTIVE' },
+      saasRef.id
+    );
+    await setDoc(doc(db, COLLECTIONS.COMM_DOCTORS, saasRef.id), publicDoctor);
+
+    // 5. Ensure tenant exists in comm_tenants
+    if (doctorData.tenantId) {
+      const tenantRef = doc(db, COLLECTIONS.COMM_TENANTS, doctorData.tenantId);
+      const tenantSnap = await getDoc(tenantRef);
+      if (!tenantSnap.exists()) {
+        const saasTenantSnap = await getDoc(doc(db, COLLECTIONS.SAAS_TENANTS, doctorData.tenantId));
+        await setDoc(tenantRef, {
+          id: doctorData.tenantId,
+          name: saasTenantSnap.exists() ? saasTenantSnap.data().name : 'Unknown Clinic',
+          active: true,
+          visibility: 'PUBLIC',
+          _syncedAt: serverTimestamp(),
+        });
+      }
+    }
+
+    return saasRef.id;
+  } catch (error) {
+    // 🔥 Rollback: Clean up Auth user if Firestore write failed
+    if (authUser?.user) {
+      await authUser.user.delete().catch(console.error);
+    }
+    // Rollback: Delete from saas_doctors if comm write failed
+    if (saasRef?.id) {
+      await deleteDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, saasRef.id)).catch(console.error);
+    }
+    throw error;
   }
-  
-  return doctorId;
 };
-function buildPublicTenant(data, tenantId) {
-  return {
-    id: tenantId,
-    name: data.name || data.clinicName || 'Unknown Clinic',
-    city: data.city || '',
-    address: data.address || '',
-    logoUrl: data.logoUrl || '',
-    description: data.description || '',
-    active: data.status === 'ACTIVE',
-    visibility: data.status === 'ACTIVE' ? 'PUBLIC' : 'HIDDEN',
-    _syncedAt: new Date().toISOString(),
-    _sourceId: tenantId,
-  };
-}
 
 // ─── LICENSES ───────────────────────────────────────────────────────────────
 
