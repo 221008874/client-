@@ -230,6 +230,10 @@ export const StyledDialog = styled(Box)({
   // or import separately; kept here for reference
 });
 
+
+
+
+
 export const dialogPaperSx = {
   backgroundColor: "#0b1628",
   borderRadius: "20px",
