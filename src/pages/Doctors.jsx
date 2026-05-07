@@ -9,6 +9,7 @@ import {
   deleteDoctor,
 } from "../services/firestoreService";
 import { uploadImageToCloudinary } from "../lib/cloudinary";
+import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
@@ -216,22 +217,43 @@ const EmptyState = styled(Box)({
 // ─── Constants ────────────────────────────────────────────────────────────
 
 const BLANK = { 
-  name: "", 
+  name: createBilingual(),
   phone: "", 
   email: "", 
   specialization: "", 
   tenantId: "", 
-  tenantName: "", 
+  tenantName: createBilingual(),
   licenseKey: "", 
   photoUrl: "",
   password: "",
   confirmPassword: "",
+  bio: createBilingual(),
+  education: createBilingual(),
+  city: createBilingual(),
+  address: createBilingual(),
+  yearsOfExperience: "",
+  languages: [],
 };
 
 const SPECIALIZATIONS = [
-  "General Practice", "Internal Medicine", "Pediatrics", 
-  "Cardiology", "Dermatology", "Orthopedics", 
-  "Neurology", "Ophthalmology", "ENT", "Psychiatry", "Other"
+  { value: "general_practice",    en: "General Practice",       ar: "طب عام" },
+  { value: "internal_medicine",   en: "Internal Medicine",      ar: "طب باطني" },
+  { value: "pediatrics",          en: "Pediatrics",             ar: "طب أطفال" },
+  { value: "cardiology",          en: "Cardiology",             ar: "طب القلب" },
+  { value: "dermatology",         en: "Dermatology",            ar: "طب جلدية" },
+  { value: "orthopedics",         en: "Orthopedics",            ar: "جراحة عظام" },
+  { value: "neurology",           en: "Neurology",              ar: "طب أعصاب" },
+  { value: "ophthalmology",       en: "Ophthalmology",          ar: "طب عيون" },
+  { value: "ent",                 en: "ENT",                    ar: "أنف وأذن وحنجرة" },
+  { value: "psychiatry",          en: "Psychiatry",             ar: "طب نفسي" },
+  { value: "dentistry",           en: "Dentistry",              ar: "طب أسنان" },
+  { value: "gynecology",          en: "Gynecology",             ar: "نساء وتوليد" },
+  { value: "general_surgery",     en: "General Surgery",        ar: "جراحة عامة" },
+  { value: "urology",             en: "Urology",                ar: "جراحة مسالك" },
+  { value: "anesthesia",          en: "Anesthesiology",         ar: "تخدير" },
+  { value: "radiology",           en: "Radiology",              ar: "أشعة" },
+  { value: "pathology",           en: "Pathology",              ar: "باثولوجيا" },
+  { value: "other",               en: "Other",                  ar: "أخرى" },
 ];
 
 // ─── Image Upload Component ───────────────────────────────────────────────
@@ -497,7 +519,7 @@ export default function Doctors() {
   // ── Create ──────────────────────────────────────────────────────────────
   const handleCreate = async () => {
     // Validation
-    if (!formData.name || !formData.tenantId) { 
+    if (!formData.name.en || !formData.tenantId) { 
       setError("Doctor name and tenant are required"); 
       return; 
     }
@@ -546,22 +568,28 @@ export default function Doctors() {
   const openEdit = (d) => {
     setEditTarget(d);
     setEditData({ 
-      name: d.name || "", 
+      name: isBilingual(d.name) ? d.name : createBilingual(d.name || ""),
       phone: d.phone || "", 
       email: d.email || "", 
       specialization: d.specialization || "", 
       tenantId: d.tenantId || "", 
-      tenantName: d.tenantName || "", 
+      tenantName: isBilingual(d.tenantName) ? d.tenantName : createBilingual(d.tenantName || ""),
       licenseKey: d.licenseKey || "",
       photoUrl: d.photoUrl || "",
-      password: "",        // Reset password fields for edit
+      password: "",
       confirmPassword: "",
+      bio: isBilingual(d.bio) ? d.bio : createBilingual(d.bio || ""),
+      education: isBilingual(d.education) ? d.education : createBilingual(d.education || ""),
+      city: isBilingual(d.city) ? d.city : createBilingual(d.city || ""),
+      address: isBilingual(d.address) ? d.address : createBilingual(d.address || ""),
+      yearsOfExperience: d.yearsOfExperience || "",
+      languages: d.languages || [],
     });
     setEditOpen(true);
   };
 
   const handleEdit = async () => {
-    if (!editTarget || !editData.name) return;
+    if (!editTarget || !editData.name.en) return;
     
     // If password is being changed, validate it
     if (editData.password) {
@@ -659,41 +687,44 @@ export default function Doctors() {
     />
   );
 
-  const TenantSelect = ({ obj, set }) => (
+  const renderTenantSelect = (obj, set) => (
     <FormControl fullWidth margin="normal">
       <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>
         Tenant (Clinic) *
       </InputLabel>
-      <StyledSelect 
-        label="Tenant (Clinic) *" 
+      <StyledSelect
+        label="Tenant (Clinic) *"
         value={obj.tenantId}
         onChange={e => {
           const t = tenants.find(t => t.id === e.target.value);
-          set(p => ({ ...p, tenantId: e.target.value, tenantName: t?.name || "" }));
+          set(p => ({ ...p, tenantId: e.target.value, tenantName: t ? createBilingual(t.name) : createBilingual() }));
         }}
       >
         {tenants.map(t => (
           <MenuItem key={t.id} value={t.id} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
-            {t.name}
+            {getLang(t.name) || t.name}
           </MenuItem>
         ))}
       </StyledSelect>
     </FormControl>
   );
 
-  const SpecSelect = ({ obj, set }) => (
+  const renderSpecSelect = (obj, set) => (
     <FormControl fullWidth margin="normal">
       <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>
-        Specialization
+        Specialization / التخصص
       </InputLabel>
-      <StyledSelect 
-        label="Specialization" 
-        value={obj.specialization} 
+      <StyledSelect
+        label="Specialization / التخصص"
+        value={obj.specialization}
         onChange={e => set(p => ({ ...p, specialization: e.target.value }))}
       >
         {SPECIALIZATIONS.map(s => (
-          <MenuItem key={s} value={s} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
-            {s}
+          <MenuItem key={s.value} value={s.value} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+              <Typography sx={{ fontSize: "13px", fontWeight: 600 }}>{s.en}</Typography>
+              <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{s.ar}</Typography>
+            </Box>
           </MenuItem>
         ))}
       </StyledSelect>
@@ -855,8 +886,13 @@ export default function Doctors() {
                           )}
                           <Box>
                             <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
-                              Dr. {d.name}
+                              Dr. {getLang(d.name)}
                             </Typography>
+                            {getLang(d.name, "ar") && getLang(d.name, "ar") !== getLang(d.name, "en") && (
+                              <Typography sx={{ fontSize: "11px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
+                                {getLang(d.name, "ar")}
+                              </Typography>
+                            )}
                             {d.email && (
                               <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>
                                 {d.email}
@@ -875,10 +911,23 @@ export default function Doctors() {
                           px: 1, py: 0.25, 
                           display: "inline-block" 
                         }}>
-                          {d.tenantName || "—"}
+                          {getLang(d.tenantName) || d.tenantName || "—"}
                         </Typography>
                       </TableCell>
-                      <TableCell>{d.specialization || "—"}</TableCell>
+                      <TableCell>
+                        {(() => {
+                          const spec = SPECIALIZATIONS.find(s => s.value === d.specialization);
+                          if (spec) {
+                            return (
+                              <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+                                <Typography sx={{ fontSize: "13px", color: "#dde6f0" }}>{spec.en}</Typography>
+                                <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{spec.ar}</Typography>
+                              </Box>
+                            );
+                          }
+                          return d.specialization || "—";
+                        })()}
+                      </TableCell>
                       <TableCell>{d.phone || "—"}</TableCell>
                       <TableCell>
                         <Typography sx={{ 
@@ -928,17 +977,21 @@ export default function Doctors() {
       </ContentWrapper>
 
       {/* ── Create Dialog ─────────────────────────────────────────────────── */}
-      <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="sm" fullWidth>
+      <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Add New Doctor</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <ImageUploadField obj={formData} set={setFormData} error={error} setError={setError} />
-          {fieldEl("Full Name *", "name", formData, setFormData)}
-          <TenantSelect obj={formData} set={setFormData} />
-          <SpecSelect obj={formData} set={setFormData} />
+          <BilingualInput label="Full Name" labelAr="الاسم الكامل" value={formData.name} onChange={v => setFormData(p => ({ ...p, name: v }))} required />
+          {renderTenantSelect(formData, setFormData)}
+          {renderSpecSelect(formData, setFormData)}
+          <BilingualInput label="Bio" labelAr="نبذة" value={formData.bio} onChange={v => setFormData(p => ({ ...p, bio: v }))} helperText="Brief description of the doctor" />
+          <BilingualInput label="Education" labelAr="المؤهلات" value={formData.education} onChange={v => setFormData(p => ({ ...p, education: v }))} />
+          <BilingualInput label="City" labelAr="المدينة" value={formData.city} onChange={v => setFormData(p => ({ ...p, city: v }))} />
+          <BilingualInput label="Address" labelAr="العنوان" value={formData.address} onChange={v => setFormData(p => ({ ...p, address: v }))} />
           {fieldEl("Phone", "phone", formData, setFormData, { placeholder: "010xxxxxxxx" })}
           {fieldEl("Email *", "email", formData, setFormData, { type: "email" })}
+          {fieldEl("Years of Experience", "yearsOfExperience", formData, setFormData, { type: "number" })}
           
-          {/* 🔑 Password Field for Create */}
           <PasswordField 
             obj={formData} 
             set={setFormData} 
@@ -977,17 +1030,21 @@ export default function Doctors() {
       </StyledDialog>
 
       {/* ── Edit Dialog ───────────────────────────────────────────────────── */}
-      <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
+      <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Edit Doctor</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <ImageUploadField obj={editData} set={setEditData} error={error} setError={setError} />
-          {fieldEl("Full Name *", "name", editData, setEditData)}
-          <TenantSelect obj={editData} set={setEditData} />
-          <SpecSelect obj={editData} set={setEditData} />
+          <BilingualInput label="Full Name" labelAr="الاسم الكامل" value={editData.name} onChange={v => setEditData(p => ({ ...p, name: v }))} required />
+          {renderTenantSelect(editData, setEditData)}
+          {renderSpecSelect(editData, setEditData)}
+          <BilingualInput label="Bio" labelAr="نبذة" value={editData.bio} onChange={v => setEditData(p => ({ ...p, bio: v }))} />
+          <BilingualInput label="Education" labelAr="المؤهلات" value={editData.education} onChange={v => setEditData(p => ({ ...p, education: v }))} />
+          <BilingualInput label="City" labelAr="المدينة" value={editData.city} onChange={v => setEditData(p => ({ ...p, city: v }))} />
+          <BilingualInput label="Address" labelAr="العنوان" value={editData.address} onChange={v => setEditData(p => ({ ...p, address: v }))} />
           {fieldEl("Phone", "phone", editData, setEditData)}
           {fieldEl("Email", "email", editData, setEditData, { type: "email" })}
+          {fieldEl("Years of Experience", "yearsOfExperience", editData, setEditData, { type: "number" })}
           
-          {/* 🔑 Password Field for Edit (optional) */}
           <PasswordField 
             obj={editData} 
             set={setEditData} 
@@ -1027,7 +1084,7 @@ export default function Doctors() {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <Typography sx={{ color: "#dde6f0", mb: 1 }}>
-            Delete <strong style={{ color: "#f87171" }}>Dr. {deleteConfirm?.name}</strong>?
+            Delete <strong style={{ color: "#f87171" }}>Dr. {getLang(deleteConfirm?.name)}</strong>?
           </Typography>
           <Typography sx={{ color: "#4a6080", fontSize: "13px", mb: 3 }}>
             This action cannot be undone.

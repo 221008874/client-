@@ -5,6 +5,7 @@ import {
   updateLicenseStatus,
   updateLicenseExpiry,
 } from "../services/firestoreService";
+import { createBilingual, getLang, BilingualInput } from "../lib/i18n";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
@@ -123,7 +124,7 @@ export default function Licenses() {
   const [editLicense, setEditLicense] = useState(null);
   const [newExpiryDate, setNewExpiryDate] = useState("");
   const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({ licenseKey: "", doctorName: "", phone: "", expiryDate: "" });
+  const [formData, setFormData] = useState({ licenseKey: "", doctorName: createBilingual(), phone: "", expiryDate: "" });
 
   useEffect(() => { loadLicenses(); }, []);
 
@@ -146,7 +147,7 @@ export default function Licenses() {
       setError(null);
       await createLicense(formData);
       setOpenDialog(false);
-      setFormData({ licenseKey: "", doctorName: "", phone: "", expiryDate: "" });
+      setFormData({ licenseKey: "", doctorName: createBilingual(), phone: "", expiryDate: "" });
       loadLicenses();
     } catch (err) {
       console.error("Failed to create license:", err);
@@ -259,7 +260,14 @@ export default function Licenses() {
                       <TableCell>
                         <Typography sx={{ fontFamily: "monospace", color: "#eaf2ff", fontWeight: 600, letterSpacing: "0.5px" }}>{lic.licenseKey}</Typography>
                       </TableCell>
-                      <TableCell>{lic.doctorName || "—"}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+                          <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                            {getLang(lic.doctorName) || lic.doctorName || "—"}
+                          </Typography>
+                          {(() => { const ar = getLang(lic.doctorName, "ar"); const en = getLang(lic.doctorName, "en"); return ar && ar !== en ? <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{ar}</Typography> : null; })()}
+                        </Box>
+                      </TableCell>
                       <TableCell>{lic.phone || "—"}</TableCell>
                       <TableCell>
                         <Typography sx={{ fontFamily: "monospace", color: lic.deviceId ? "#34d399" : "#6a8aaa", fontSize: "12px" }}>
@@ -294,7 +302,7 @@ export default function Licenses() {
         <DialogTitle>Create New License</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <StyledDialogField fullWidth label="License Key *" margin="normal" value={formData.licenseKey} onChange={(e) => setFormData({ ...formData, licenseKey: e.target.value })} helperText="Use a unique key (e.g., LIC-2026-001)" placeholder="LIC-2026-001" />
-          <StyledDialogField fullWidth label="Doctor Name *" margin="normal" value={formData.doctorName} onChange={(e) => setFormData({ ...formData, doctorName: e.target.value })} />
+          <BilingualInput label="Doctor Name" labelAr="اسم الطبيب" value={formData.doctorName} onChange={v => setFormData(p => ({ ...p, doctorName: v }))} />
           <StyledDialogField fullWidth label="Phone" margin="normal" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="010xxxxxxxx" />
           <StyledDialogField fullWidth label="Expiry Date *" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={formData.expiryDate} onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })} />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>

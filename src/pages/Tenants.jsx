@@ -6,6 +6,7 @@ import {
   updateTenantStatus,
   deleteTenant,
 } from "../services/firestoreService";
+import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
@@ -149,7 +150,15 @@ const StatCard = styled(Box)({
 
 // ─── Blank form state ────────────────────────────────────────────────────────
 
-const BLANK = { name: "", contactEmail: "", contactPhone: "", address: "", plan: "BASIC" };
+const BLANK = {
+  name: createBilingual(),
+  contactEmail: "",
+  contactPhone: "",
+  address: createBilingual(),
+  city: createBilingual(),
+  description: createBilingual(),
+  plan: "BASIC",
+};
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -178,7 +187,7 @@ export default function Tenants() {
 
   // ── Create ────────────────────────────────────────────────────────────────
   const handleCreate = async () => {
-    if (!formData.name) { setError("Tenant name is required"); return; }
+    if (!formData.name.en) { setError("Tenant name (English) is required"); return; }
     try {
       setError(null);
       await createTenant(formData);
@@ -193,12 +202,20 @@ export default function Tenants() {
   // ── Edit ─────────────────────────────────────────────────────────────────
   const openEdit = (t) => {
     setEditTarget(t);
-    setEditData({ name: t.name || "", contactEmail: t.contactEmail || "", contactPhone: t.contactPhone || "", address: t.address || "", plan: t.plan || "BASIC" });
+    setEditData({
+      name: isBilingual(t.name) ? t.name : createBilingual(t.name || ""),
+      contactEmail: t.contactEmail || "",
+      contactPhone: t.contactPhone || "",
+      address: isBilingual(t.address) ? t.address : createBilingual(t.address || ""),
+      city: isBilingual(t.city) ? t.city : createBilingual(t.city || ""),
+      description: isBilingual(t.description) ? t.description : createBilingual(t.description || ""),
+      plan: t.plan || "BASIC",
+    });
     setEditOpen(true);
   };
 
   const handleEdit = async () => {
-    if (!editTarget || !editData.name) return;
+    if (!editTarget || !editData.name.en) return;
     try {
       setError(null);
       await updateTenant(editTarget.id, editData);
@@ -214,7 +231,7 @@ export default function Tenants() {
     try {
       await updateTenantStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE");
       load();
-    } catch (e) {
+    } catch (_) {
       setError("Failed to update status");
     }
   };
@@ -234,8 +251,6 @@ export default function Tenants() {
   // ── Stats ─────────────────────────────────────────────────────────────────
   const active   = tenants.filter(t => t.status === "ACTIVE").length;
   const inactive = tenants.filter(t => t.status === "INACTIVE").length;
-  const plans    = { BASIC: 0, PRO: 0, ENTERPRISE: 0 };
-  tenants.forEach(t => { if (plans[t.plan] !== undefined) plans[t.plan]++; });
 
   if (loading) {
     return (
@@ -283,7 +298,7 @@ export default function Tenants() {
             { label: "Total Tenants", value: tenants.length, color: "#2dd4bf" },
             { label: "Active",        value: active,         color: "#34d399" },
             { label: "Inactive",      value: inactive,       color: "#f87171" },
-            { label: "Enterprise",    value: plans.ENTERPRISE, color: "#a78bfa" },
+            { label: "Pro",           value: tenants.filter(t => t.plan === "PRO").length,           color: "#60a5fa" },
           ].map(s => (
             <StatCard key={s.label}>
               <Typography sx={{ color: "#4a6080", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>{s.label}</Typography>
@@ -321,8 +336,15 @@ export default function Tenants() {
                   tenants.map(t => (
                     <TableRow key={t.id}>
                       <TableCell>
-                        <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>{t.name}</Typography>
-                        {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{t.address}</Typography>}
+                        <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                          {getLang(t.name)}
+                        </Typography>
+                        {getLang(t.name, "ar") && getLang(t.name, "ar") !== getLang(t.name, "en") && (
+                          <Typography sx={{ fontSize: "12px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
+                            {getLang(t.name, "ar")}
+                          </Typography>
+                        )}
+                        {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || t.address}</Typography>}
                       </TableCell>
                       <TableCell>{t.contactEmail || "—"}</TableCell>
                       <TableCell>{t.contactPhone || "—"}</TableCell>
@@ -358,13 +380,15 @@ export default function Tenants() {
       </ContentWrapper>
 
       {/* ── Create Dialog ────────────────────────────────────────────────────── */}
-      <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="sm" fullWidth>
+      <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Create New Tenant</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          {field("Clinic / Organization Name *", "name", formData, setFormData)}
+          <BilingualInput label="Clinic / Organization Name" labelAr="اسم العيادة / المنظمة" value={formData.name} onChange={v => setFormData(p => ({ ...p, name: v }))} required />
+          <BilingualInput label="Address" labelAr="العنوان" value={formData.address} onChange={v => setFormData(p => ({ ...p, address: v }))} />
+          <BilingualInput label="City" labelAr="المدينة" value={formData.city} onChange={v => setFormData(p => ({ ...p, city: v }))} />
+          <BilingualInput label="Description" labelAr="الوصف" value={formData.description} onChange={v => setFormData(p => ({ ...p, description: v }))} />
           {field("Contact Email", "contactEmail", formData, setFormData, { type: "email" })}
           {field("Contact Phone", "contactPhone", formData, setFormData, { placeholder: "010xxxxxxxx" })}
-          {field("Address", "address", formData, setFormData)}
           <FormControl fullWidth margin="normal">
             <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Plan</InputLabel>
             <StyledSelect label="Plan" value={formData.plan} onChange={e => setFormData(p => ({ ...p, plan: e.target.value }))}>
@@ -379,13 +403,15 @@ export default function Tenants() {
       </StyledDialog>
 
       {/* ── Edit Dialog ──────────────────────────────────────────────────────── */}
-      <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
+      <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Edit Tenant</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          {field("Clinic / Organization Name *", "name", editData, setEditData)}
+          <BilingualInput label="Clinic / Organization Name" labelAr="اسم العيادة / المنظمة" value={editData.name} onChange={v => setEditData(p => ({ ...p, name: v }))} required />
+          <BilingualInput label="Address" labelAr="العنوان" value={editData.address} onChange={v => setEditData(p => ({ ...p, address: v }))} />
+          <BilingualInput label="City" labelAr="المدينة" value={editData.city} onChange={v => setEditData(p => ({ ...p, city: v }))} />
+          <BilingualInput label="Description" labelAr="الوصف" value={editData.description} onChange={v => setEditData(p => ({ ...p, description: v }))} />
           {field("Contact Email", "contactEmail", editData, setEditData, { type: "email" })}
           {field("Contact Phone", "contactPhone", editData, setEditData)}
-          {field("Address", "address", editData, setEditData)}
           <FormControl fullWidth margin="normal">
             <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Plan</InputLabel>
             <StyledSelect label="Plan" value={editData.plan} onChange={e => setEditData(p => ({ ...p, plan: e.target.value }))}>

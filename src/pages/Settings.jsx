@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createBilingual, BilingualInput } from "../lib/i18n";
 import {
   Box, Typography, TextField, Button, Switch,
   CircularProgress, Alert, Divider,
@@ -97,7 +98,7 @@ const saveSettings = async (data) => {
 // ─── Default State ────────────────────────────────────────────────────────────
 
 const DEFAULT = {
-  appName: "Smart Clinic",
+  appName: createBilingual("Smart Clinic", "عيادة ذكية"),
   supportEmail: "",
   supportPhone: "",
   defaultLicenseDays: 365,
@@ -182,8 +183,8 @@ export default function Settings() {
         <SettingsCard>
           <CardTitle>🏥 General</CardTitle>
           <CardDesc>Platform identity and support contacts</CardDesc>
+          <BilingualInput label="Platform Name" labelAr="اسم المنصة" value={settings.appName} onChange={v => setSettings(s => ({ ...s, appName: v }))} />
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-            {field("Platform Name", "appName")}
             {field("Support Email", "supportEmail", { type: "email" })}
             {field("Support Phone", "supportPhone", { placeholder: "010xxxxxxxx" })}
           </Box>

@@ -20,6 +20,8 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 // ─── CRITICAL: db must be from the SAME modular SDK instance ──────────────
 import { db } from "../firebase";
 
+import { isBilingual, createBilingual } from "../lib/i18n";
+
 export const COLLECTIONS = {
   SAAS_TENANTS: "saas_tenants",
   SAAS_DOCTORS: "saas_doctors",
@@ -34,21 +36,29 @@ export const COLLECTIONS = {
   SERVERS: "clinic_servers",
 };
 
+// ─── BILINGUAL FIELD NORMALIZER ─────────────────────────────────────────────
+// Accepts raw value (string or {en, ar}) and always returns {en, ar}
+function normalizeBilingual(raw, fallbackEn = "", fallbackAr = "") {
+  if (isBilingual(raw)) return raw;
+  if (typeof raw === "string") return createBilingual(raw, raw);
+  return createBilingual(fallbackEn, fallbackAr);
+}
+
 // ─── PUBLIC-SAFE FIELD BUILDERS ─────────────────────────────────────────────
 function buildPublicDoctor(data, doctorId) {
   return {
-    name: data.name || "",
-    specialty: data.specialization || data.specialty || "",
-    bio: data.bio || "",
+    name: normalizeBilingual(data.name),
+    specialty: normalizeBilingual(data.specialization || data.specialty),
+    bio: normalizeBilingual(data.bio),
     photoUrl: data.photoUrl || "",
     tenantId: data.tenantId || data.clinicId || "",
-    clinicName: data.tenantName || data.clinicName || "",
-    city: data.city || "",
-    address: data.address || "",
+    clinicName: normalizeBilingual(data.tenantName || data.clinicName),
+    city: normalizeBilingual(data.city),
+    address: normalizeBilingual(data.address),
     workingDays: data.workingDays || [],
     timeSlots: data.timeSlots || [],
-    education: data.education || "",
-    languages: data.languages || [],
+    education: normalizeBilingual(data.education),
+    languages: Array.isArray(data.languages) ? data.languages.map(l => normalizeBilingual(l)) : [],
     yearsOfExperience: data.yearsOfExperience || null,
     active: data.status === "ACTIVE",
     visibility: data.status === "ACTIVE" ? "PUBLIC" : "HIDDEN",
@@ -61,11 +71,11 @@ function buildPublicDoctor(data, doctorId) {
 function buildPublicTenant(data, tenantId) {
   return {
     id: tenantId,
-    name: data.name || data.clinicName || "Unknown Clinic",
-    city: data.city || "",
-    address: data.address || "",
+    name: normalizeBilingual(data.name || data.clinicName),
+    city: normalizeBilingual(data.city),
+    address: normalizeBilingual(data.address),
     logoUrl: data.logoUrl || "",
-    description: data.description || "",
+    description: normalizeBilingual(data.description),
     active: data.status === "ACTIVE",
     visibility: data.status === "ACTIVE" ? "PUBLIC" : "HIDDEN",
     _syncedAt: serverTimestamp(),
@@ -158,7 +168,7 @@ export const updateTenant = async (tenantId, updates) => {
     updatedAt: serverTimestamp(),
   });
 
-  // 2. Sync allowed fields to comm_tenants
+  // 2. Sync allowed fields to comm_tenants (supports bilingual {en, ar})
   const publicUpdates = {};
   [
     "name",
