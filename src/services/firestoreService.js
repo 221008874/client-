@@ -14,6 +14,7 @@ import {
   limit,
   startAfter,
   getDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -44,15 +45,56 @@ function normalizeBilingual(raw, fallbackEn = "", fallbackAr = "") {
   return createBilingual(fallbackEn, fallbackAr);
 }
 
+// ─── SPECIALIZATION DISPLAY LOOKUP ────────────────────────────────────────
+const SPECIALIZATION_DISPLAY = {
+  general_practice:  { en: "General Practice",     ar: "طب عام" },
+  internal_medicine: { en: "Internal Medicine",    ar: "طب باطني" },
+  pediatrics:        { en: "Pediatrics",           ar: "طب أطفال" },
+  cardiology:        { en: "Cardiology",           ar: "طب القلب" },
+  dermatology:       { en: "Dermatology",          ar: "طب جلدية" },
+  orthopedics:       { en: "Orthopedics",          ar: "جراحة عظام" },
+  neurology:         { en: "Neurology",            ar: "طب أعصاب" },
+  ophthalmology:     { en: "Ophthalmology",        ar: "طب عيون" },
+  ent:               { en: "ENT",                  ar: "أنف وأذن وحنجرة" },
+  psychiatry:        { en: "Psychiatry",           ar: "طب نفسي" },
+  dentistry:         { en: "Dentistry",            ar: "طب أسنان" },
+  gynecology:        { en: "Gynecology",           ar: "نساء وتوليد" },
+  general_surgery:   { en: "General Surgery",      ar: "جراحة عامة" },
+  urology:           { en: "Urology",              ar: "جراحة مسالك" },
+  anesthesia:        { en: "Anesthesiology",       ar: "تخدير" },
+  radiology:         { en: "Radiology",            ar: "أشعة" },
+  pathology:         { en: "Pathology",            ar: "باثولوجيا" },
+  other:             { en: "Other",                ar: "أخرى" },
+};
+
+function resolveSpecialty(raw) {
+  if (isBilingual(raw)) return raw;
+  if (typeof raw === "string") {
+    const mapped = SPECIALIZATION_DISPLAY[raw];
+    if (mapped) return createBilingual(mapped.en, mapped.ar);
+    return createBilingual(raw, raw);
+  }
+  return createBilingual("", "");
+}
+
+function resolveSpecialtyKey(raw) {
+  if (typeof raw === "string") {
+    return SPECIALIZATION_DISPLAY[raw] ? raw : raw;
+  }
+  return raw?.en || raw?.ar || "";
+}
+
 // ─── PUBLIC-SAFE FIELD BUILDERS ─────────────────────────────────────────────
 function buildPublicDoctor(data, doctorId) {
   const nameB = normalizeBilingual(data.name);
-  const specialtyB = normalizeBilingual(data.specialization || data.specialty);
+  const specialtyB = resolveSpecialty(data.specialization || data.specialty);
+  const specialtyKey = resolveSpecialtyKey(data.specialization || data.specialty);
   return {
     name: nameB,
     nameEn: nameB.en || '',
     specialty: specialtyB,
     specialtyEn: specialtyB.en || '',
+    specialtyKey,
     bio: normalizeBilingual(data.bio),
     photoUrl: data.photoUrl || "",
     tenantId: data.tenantId || data.clinicId || "",
@@ -213,25 +255,21 @@ export const deleteTenant = async (tenantId) => {
 };
 
 // ─── DOCTORS (SaaS + COMM dual-write) ─────────────────────────────────────
-// 🔑 SINGLE createDoctor function with Firebase Auth integration
 export const createDoctor = async (doctorData) => {
-  let saasRef;
+  const { password, confirmPassword, ...doctorPublicData } = doctorData;
+
+  // 1. Write to saas_doctors (internal admin data)
+  const saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_DOCTORS), {
+    ...doctorPublicData,
+    status: "ACTIVE",
+    createdAt: serverTimestamp(),
+  });
+
+  // 2. Create Firebase Auth account for doctor login (if password provided)
   let authUser = null;
-
-  try {
-    // 🔑 Extract password before storing in Firestore (never store passwords in Firestore)
-    const { password, confirmPassword, ...doctorPublicData } = doctorData;
-
-    // 1. Write to saas_doctors (internal admin data)
-    saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_DOCTORS), {
-      ...doctorPublicData,
-      status: "ACTIVE",
-      createdAt: serverTimestamp(),
-    });
-
-    // 2. Create Firebase Auth account for doctor login (if password provided)
-    if (doctorData.email && password) {
-      const auth = getAuth();
+  if (doctorData.email && password) {
+    const auth = getAuth();
+    try {
       authUser = await createUserWithEmailAndPassword(
         auth,
         doctorData.email,
@@ -244,60 +282,66 @@ export const createDoctor = async (doctorData) => {
         {
           doctorId: saasRef.id,
           email: doctorData.email,
-          firstLogin: true, // 🔑 CRITICAL: Flag for mandatory password change
+          firstLogin: true,
           createdAt: serverTimestamp(),
         }
       );
+    } catch (authErr) {
+      console.error("Auth creation failed, cleaning up saas_doctors:", authErr);
+      await deleteDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, saasRef.id));
+      throw authErr;
     }
+  }
 
-    // 4. Mirror to comm_doctors (public-safe, NO password field)
-    const publicDoctor = buildPublicDoctor(
-      { ...doctorPublicData, status: "ACTIVE" },
-      saasRef.id
-    );
+  // 4. Mirror to comm_doctors (public-safe, NO password field)
+  const publicDoctor = buildPublicDoctor(
+    { ...doctorPublicData, status: "ACTIVE" },
+    saasRef.id
+  );
+  try {
     await setDoc(
       doc(db, COLLECTIONS.COMM_DOCTORS, saasRef.id),
       publicDoctor
     );
-
-    // 5. Ensure tenant exists in comm_tenants
-    if (doctorData.tenantId) {
-      const tenantRef = doc(
-        db,
-        COLLECTIONS.COMM_TENANTS,
-        doctorData.tenantId
-      );
-      const tenantSnap = await getDoc(tenantRef);
-      if (!tenantSnap.exists()) {
-        const saasTenantSnap = await getDoc(
-          doc(db, COLLECTIONS.SAAS_TENANTS, doctorData.tenantId)
-        );
-        await setDoc(tenantRef, {
-          id: doctorData.tenantId,
-          name: saasTenantSnap.exists()
-            ? saasTenantSnap.data().name
-            : "Unknown Clinic",
-          active: true,
-          visibility: "PUBLIC",
-          _syncedAt: serverTimestamp(),
-        });
-      }
-    }
-
-    return saasRef.id;
-  } catch (error) {
-    // 🔥 Rollback: Clean up Auth user if Firestore write failed
+    console.log("Doctor synced to comm_doctors:", saasRef.id);
+  } catch (commErr) {
+    console.error("comm_doctors write failed:", commErr);
+    // Clean up Auth user
     if (authUser?.user) {
       await authUser.user.delete().catch(console.error);
     }
-    // Rollback: Delete from saas_doctors if comm write failed
-    if (saasRef?.id) {
-      await deleteDoc(
-        doc(db, COLLECTIONS.SAAS_DOCTORS, saasRef.id)
-      ).catch(console.error);
-    }
-    throw error;
+    // Clean up saas_doctors
+    await deleteDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, saasRef.id));
+    throw commErr;
   }
+
+  // 5. Ensure tenant exists in comm_tenants
+  if (doctorData.tenantId) {
+    const tenantRef = doc(
+      db,
+      COLLECTIONS.COMM_TENANTS,
+      doctorData.tenantId
+    );
+    const tenantSnap = await getDoc(tenantRef);
+    if (!tenantSnap.exists()) {
+      const saasTenantSnap = await getDoc(
+        doc(db, COLLECTIONS.SAAS_TENANTS, doctorData.tenantId)
+      );
+      await setDoc(tenantRef, {
+        id: doctorData.tenantId,
+        name: saasTenantSnap.exists()
+          ? saasTenantSnap.data().name
+          : "Unknown Clinic",
+        active: true,
+        visibility: "PUBLIC",
+        _syncedAt: serverTimestamp(),
+      }).catch((e) =>
+        console.error("Tenant sync to comm_tenants failed (non-fatal):", e)
+      );
+    }
+  }
+
+  return saasRef.id;
 };
 
 export const getAllDoctors = async () => {
@@ -387,11 +431,10 @@ export const updateDoctor = async (doctorId, updates) => {
     if (updates[f] !== undefined) publicUpdates[f] = updates[f];
   });
   if (updates.specialization !== undefined) {
-    const specB = isBilingual(updates.specialization)
-      ? updates.specialization
-      : normalizeBilingual(updates.specialization);
+    const specB = resolveSpecialty(updates.specialization);
     publicUpdates.specialty = specB;
     publicUpdates.specialtyEn = specB.en || '';
+    publicUpdates.specialtyKey = resolveSpecialtyKey(updates.specialization);
   }
   if (updates.name !== undefined) {
     const nameB = isBilingual(updates.name)
