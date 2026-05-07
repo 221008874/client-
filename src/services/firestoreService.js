@@ -16,7 +16,6 @@ import {
   getDoc,
   writeBatch,
 } from "firebase/firestore";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 // ─── CRITICAL: db must be from the SAME modular SDK instance ──────────────
 import { db } from "../firebase";
