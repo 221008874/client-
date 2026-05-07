@@ -1,77 +1,124 @@
-import { Box, Typography } from "@mui/material";
+// src/lib/i18n.jsx
+//
+// KEY FIX: BilingualInput is now FULLY CONTROLLED — no useState inside.
+// The old version (with useState initialized from props) caused the
+// "text typed in one field appears in another" bug because:
+//   1. React reuses component instances between renders (no remount)
+//   2. useState only runs its initialiser ONCE per mount
+//   3. Multiple BilingualInput instances in one form shared stale state
+//      when the parent reset formData to BLANK
+//
+// Solution: read directly from props.value every render, call onChange
+// for every keystroke. Parent owns all state — zero duplication.
 
-/* eslint-disable react-refresh/only-export-components */
+import { Box, TextField } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-// ─── Bilingual field helpers (EN/AR) ──────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-export const createBilingual = (en = "", ar = "") => ({ en, ar });
+/**
+ * Always returns a FRESH object — never reuse a reference.
+ * Pass en/ar to pre-fill; both default to "".
+ */
+export const createBilingual = (en = "", ar = "") => ({ en: String(en ?? ""), ar: String(ar ?? "") });
 
+/** Returns true when value looks like a bilingual object. */
 export const isBilingual = (v) =>
-  v !== null && typeof v === "object" && "en" in v && "ar" in v;
+  v !== null && typeof v === "object" && !Array.isArray(v) && ("en" in v || "ar" in v);
 
-export const getLang = (field, lang = "en") => {
-  if (isBilingual(field)) return field[lang] || field.en || "";
-  return typeof field === "string" ? field : "";
+/**
+ * Safely read one language from a bilingual value or plain string.
+ * Falls back: requested lang → "en" → first key → empty string.
+ */
+export const getLang = (value, lang = "en") => {
+  if (value == null) return "";
+  if (isBilingual(value)) {
+    return value[lang] ?? value.en ?? Object.values(value)[0] ?? "";
+  }
+  return String(value);
 };
 
-export const updateBilingual = (field, lang, value) => {
-  if (isBilingual(field)) return { ...field, [lang]: value };
-  return { en: lang === "en" ? value : getLang(field, "en"), ar: lang === "ar" ? value : getLang(field, "ar") };
-};
+// ─── Styled field used by BilingualInput ─────────────────────────────────────
 
-// ─── MUI Bilingual Input (two side-by-side fields) ───────────────────────
+const BiField = styled(TextField)({
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "#0f1e36",
+    borderRadius: "10px",
+    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
+    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
+    "&.Mui-focused fieldset": { borderColor: "#0fb8a6", boxShadow: "0 0 0 3px rgba(15,184,166,0.12)" },
+  },
+  "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
+  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#0fb8a6" },
+  "& .MuiFormHelperText-root": { color: "#4a6080", fontSize: "11px" },
+});
 
-export function BilingualInput({ label, labelAr, value, onChange, required, placeholder, placeholderAr, type, helperText }) {
-  const enVal = getLang(value, "en");
-  const arVal = getLang(value, "ar");
+// ─── BilingualInput ───────────────────────────────────────────────────────────
 
-  const handleEn = (e) => onChange(updateBilingual(value, "en", e.target.value));
-  const handleAr = (e) => onChange(updateBilingual(value, "ar", e.target.value));
+/**
+ * Renders two text fields side-by-side: English (LTR) + Arabic (RTL).
+ *
+ * Props
+ * ─────
+ * label      English field label  (default "Name")
+ * labelAr    Arabic field label   (default "الاسم")
+ * value      { en: string, ar: string }  — owned by the parent
+ * onChange   (newValue: { en, ar }) => void  — parent must call setState
+ * required   adds asterisk to the English label
+ * helperText shown under the English field
+ * disabled   disables both inputs
+ */
+export function BilingualInput({
+  label    = "Name",
+  labelAr  = "الاسم",
+  value,
+  onChange,
+  required   = false,
+  helperText = undefined,
+  disabled   = false,
+}) {
+  // Normalise whatever the parent hands us into a safe { en, ar } object.
+  // We do NOT store this in local state — that's intentional.
+  const safe = isBilingual(value)
+    ? value
+    : createBilingual(typeof value === "string" ? value : "");
 
   return (
-    <Box sx={{ mt: 2, mb: 1 }}>
-      <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography sx={{ color: "#3a5070", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>
-            {label} {required ? "*" : ""}
-          </Typography>
-          <input
-            type={type || "text"}
-            value={enVal}
-            placeholder={placeholder || label}
-            onChange={handleEn}
-            required={required}
-            style={{
-              width: "100%", padding: "10px 14px", backgroundColor: "#0f1e36",
-              border: "1px solid rgba(15,184,166,0.18)", borderRadius: "10px",
-              color: "#dde6f0", fontSize: "14px", outline: "none",
-              boxSizing: "border-box",
-            }}
-          />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography sx={{ color: "#3a5070", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>
-            {labelAr || label} (العربية)
-          </Typography>
-          <input
-            type={type || "text"}
-            value={arVal}
-            placeholder={placeholderAr || labelAr || label}
-            onChange={handleAr}
-            required={required}
-            dir="rtl"
-            style={{
-              width: "100%", padding: "10px 14px", backgroundColor: "#0f1e36",
-              border: "1px solid rgba(15,184,166,0.18)", borderRadius: "10px",
-              color: "#dde6f0", fontSize: "14px", outline: "none", textAlign: "right",
-              boxSizing: "border-box",
-            }}
-          />
-        </Box>
-      </Box>
-      {helperText && (
-        <Typography sx={{ color: "#4a6080", fontSize: "11px", mt: 0.5 }}>{helperText}</Typography>
-      )}
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+        gap: 1.5,
+        my: 1,
+      }}
+    >
+      {/* ── English ── */}
+      <BiField
+        label={required ? `${label} *` : label}
+        value={safe.en}
+        onChange={(e) => onChange({ ...safe, en: e.target.value })}
+        disabled={disabled}
+        helperText={helperText}
+        fullWidth
+        inputProps={{ dir: "ltr" }}
+      />
+
+      {/* ── Arabic ── */}
+      <BiField
+        label={labelAr}
+        value={safe.ar}
+        onChange={(e) => onChange({ ...safe, ar: e.target.value })}
+        disabled={disabled}
+        fullWidth
+        inputProps={{
+          dir: "rtl",
+          style: { fontFamily: "'Cairo', 'Tajawal', sans-serif", textAlign: "right" },
+        }}
+        InputLabelProps={{
+          style: { fontFamily: "'Cairo', 'Tajawal', sans-serif" },
+        }}
+      />
     </Box>
   );
 }
