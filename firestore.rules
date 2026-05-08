@@ -14,6 +14,11 @@ service cloud.firestore {
         request.auth.uid in get(/databases/$(database)/documents/saas_tenants/$(tenantId)).data.staffUids;
     }
 
+    function isAnonymous() {
+      return request.auth != null &&
+        request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
     function isValidPhone(phone) {
       return phone.matches('^01[0125][0-9]{8}$');
     }
@@ -37,12 +42,14 @@ service cloud.firestore {
     // ─── comm_patients ───────────────────────────────────────────────────
     match /comm_patients/{phone} {
       allow read: if request.auth != null && (
+        isAnonymous() ||
         request.auth.token.phone_number == phone ||
         isTenantStaff(resource.data.tenantId) ||
         isAnyAdmin()
       );
-      allow create: if (request.resource.data.phone == phone && isValidPhone(phone)) || isAnyAdmin();
-      allow update: if request.auth.token.phone_number == phone ||
+      allow create: if (request.resource.data.phone == phone && isValidPhone(phone)) || isAnyAdmin() || isAnonymous();
+      allow update: if isAnonymous() ||
+        request.auth.token.phone_number == phone ||
         isTenantStaff(resource.data.tenantId) ||
         isAnyAdmin();
       allow delete: if isAnyAdmin();
@@ -51,13 +58,15 @@ service cloud.firestore {
     // ─── comm_appointments ───────────────────────────────────────────────
     match /comm_appointments/{appointmentId} {
       allow read: if request.auth != null && (
+        isAnonymous() ||
         resource.data.patientPhone == request.auth.token.phone_number ||
         isTenantStaff(resource.data.tenantId) ||
         isAnyAdmin()
       );
       allow create: if request.auth != null &&
         isValidPhone(request.resource.data.patientPhone);
-      allow update: if request.auth.token.phone_number == resource.data.patientPhone ||
+      allow update: if isAnonymous() ||
+        request.auth.token.phone_number == resource.data.patientPhone ||
         isTenantStaff(resource.data.tenantId) ||
         isAnyAdmin();
       allow delete: if isAnyAdmin();
@@ -99,6 +108,45 @@ service cloud.firestore {
     match /saas_settings/{settingId} {
       allow read: if isAnyAdmin();
       allow create, update, delete: if isAnyAdmin();
+    }
+
+    // ─── NEW: License System Collections ────────────────────────────────
+    match /licenses/{licenseId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /server_license/{docId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /server_instances/{macAddress} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /invalid_reports/{reportId} {
+      allow read: if isAnyAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if isAnyAdmin();
+    }
+
+    match /license_logs/{logId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /servers/{serverId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /sync_queue/{queueId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /saas_audit_events/{eventId} {
+      allow read, write: if isAnyAdmin();
     }
 
     // ─── Deny everything else by default ─────────────────────────────────

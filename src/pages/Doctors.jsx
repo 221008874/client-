@@ -702,7 +702,7 @@ export default function Doctors() {
         value={obj.tenantId}
         onChange={e => {
           const t = tenants.find(t => t.id === e.target.value);
-          set(p => ({ ...p, tenantId: e.target.value, tenantName: t ? createBilingual(t.name) : createBilingual() }));
+          set(p => ({ ...p, tenantId: e.target.value, tenantName: t ? (isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name))) : createBilingual() }));
         }}
       >
         {tenants.map(t => (
@@ -772,7 +772,7 @@ export default function Doctors() {
               </MenuItem>
               {tenants.map(t => (
                 <MenuItem key={t.id} value={t.id} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
-                  {t.name}
+                  {getLang(t.name)}
                 </MenuItem>
               ))}
             </StyledSelect>
