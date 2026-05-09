@@ -10,6 +10,7 @@ import {
 } from "../services/firestoreService";
 import { uploadImageToCloudinary } from "../lib/cloudinary";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
+import { debug } from "../lib/debug";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
 import logo from "../assets/logo.png";
@@ -270,6 +271,8 @@ function ImageUploadField({ obj, set, setError }) {
     const file = e.target.files[0];
     if (!file) return;
 
+    debug.action('Doctors.upload', `File selected: ${file.name}, size: ${(file.size / 1024).toFixed(1)}KB, type: ${file.type}`);
+
     if (!file.type.startsWith("image/")) {
       setError && setError("Please select an image file (JPG, PNG, WebP)");
       return;
@@ -504,18 +507,24 @@ export default function Doctors() {
   const [tenantFilter, setTenantFilter] = useState("ALL");
   const [actionLoading, setActionLoading] = useState(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    debug.component('Doctors', 'Mounted');
+    load();
+    return () => debug.component('Doctors', 'Unmounted');
+  }, []);
 
   const load = async () => {
+    debug.action('Doctors', 'Loading doctors and tenants...');
     try {
       setLoading(true); 
       setError(null);
       const [docs, tens] = await Promise.all([getAllDoctors(), getAllTenants()]);
       setDoctors(docs); 
       setTenants(tens);
+      debug.action('Doctors', `Loaded ${docs.length} doctors, ${tens.length} tenants`);
     } catch (e) { 
+      debug.error('Doctors.load', e);
       setError("Failed to load data."); 
-      console.error(e); 
     } finally { 
       setLoading(false); 
     }
@@ -554,15 +563,17 @@ export default function Doctors() {
     }
 
     setActionLoading('create');
+    debug.action('Doctors', 'Creating doctor', { email: formData.email, tenant: formData.tenantId });
     try {
       setError(null);
-      // Remove confirmPassword before sending to backend
       const { confirmPassword: _cp, ...doctorData } = formData;
       await createDoctor(doctorData);
+      debug.action('Doctors', 'Doctor created', { email: formData.email });
       setCreateOpen(false); 
       setFormData(BLANK); 
       load();
     } catch (e) { 
+      debug.error('Doctors.create', e);
       setError("Failed to create doctor: " + e.message); 
     } finally { 
       setActionLoading(null); 
@@ -617,9 +628,9 @@ export default function Doctors() {
     }
 
     setActionLoading('edit');
+    debug.action('Doctors', 'Updating doctor', { id: editTarget.id, email: editData.email });
     try {
       setError(null);
-      // Only include password if it's being changed
       const updateData = { ...editData };
       if (!updateData.password) {
         delete updateData.password;
@@ -628,9 +639,11 @@ export default function Doctors() {
         delete updateData.confirmPassword;
       }
       await updateDoctor(editTarget.id, updateData);
+      debug.action('Doctors', 'Doctor updated', { id: editTarget.id });
       setEditOpen(false); 
       load();
     } catch (e) { 
+      debug.error('Doctors.update', e);
       setError("Failed to update doctor: " + e.message); 
     } finally { 
       setActionLoading(null); 
@@ -639,29 +652,34 @@ export default function Doctors() {
 
   // ── Toggle Status ───────────────────────────────────────────────────────
   const toggleStatus = async (id, current) => {
+    debug.action('Doctors', `Toggling status: ${id} (${current} -> ${current === "ACTIVE" ? "INACTIVE" : "ACTIVE"})`);
     setActionLoading(`status-${id}`);
     try { 
       await updateDoctorStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE"); 
+      debug.action('Doctors', `Status updated: ${id}`);
       load(); 
     } catch (e) { 
+      debug.error('Doctors.toggleStatus', e);
       setError("Failed to update status"); 
     } finally {
       setActionLoading(null);
     }
   };
 
-  // ── Delete ──────────────────────────────────────────────────────────────
   const handleDelete = async () => {
     if (!deleteConfirm) return;
+    debug.action('Doctors', 'Deleting doctor', { id: deleteConfirm.id });
     setActionLoading('delete');
     try { 
       await deleteDoctor(deleteConfirm.id); 
+      debug.action('Doctors', 'Doctor deleted', { id: deleteConfirm.id });
       setDeleteConfirm(null); 
       load(); 
     } catch (e) { 
+      debug.error('Doctors.delete', e);
       setError("Failed to delete doctor: " + e.message); 
-    } finally {
-      setActionLoading(null);
+    } finally { 
+      setActionLoading(null); 
     }
   };
 

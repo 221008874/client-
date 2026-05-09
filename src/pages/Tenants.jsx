@@ -7,6 +7,7 @@ import {
   deleteTenant,
 } from "../services/firestoreService";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
+import { debug } from "../lib/debug";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
 import logo from "../assets/logo.png";
@@ -178,34 +179,45 @@ export default function Tenants() {
   const [editData, setEditData]       = useState(BLANK);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    debug.component('Tenants', 'Mounted');
+    load();
+    return () => debug.component('Tenants', 'Unmounted');
+  }, []);
 
   const load = async () => {
+    debug.action('Tenants', 'Loading tenants...');
     try {
       setLoading(true); setError(null);
-      setTenants(await getAllTenants());
+      const data = await getAllTenants();
+      setTenants(data);
+      debug.action('Tenants', `Loaded ${data.length} tenants`);
     } catch (e) {
+      debug.error('Tenants.load', e);
       setError("Failed to load tenants.");
-      console.error(e);
     } finally { setLoading(false); }
   };
 
   // ── Create ────────────────────────────────────────────────────────────────
   const handleCreate = async () => {
     if (!formData.name.en) { setError("Tenant name (English) is required"); return; }
+    debug.action('Tenants', 'Creating tenant', { name: getLang(formData.name) });
     try {
       setError(null);
       await createTenant(formData);
+      debug.action('Tenants', 'Tenant created');
       setCreateOpen(false);
       setFormData(BLANK);
       load();
     } catch (e) {
+      debug.error('Tenants.create', e);
       setError("Failed to create tenant: " + e.message);
     }
   };
 
   // ── Edit ─────────────────────────────────────────────────────────────────
   const openEdit = (t) => {
+    debug.action('Tenants', `Opening edit: ${t.id}`);
     setEditTarget(t);
     setEditData({
       name: isBilingual(t.name) ? t.name : createBilingual(t.name || ""),
@@ -221,20 +233,25 @@ export default function Tenants() {
 
   const handleEdit = async () => {
     if (!editTarget || !editData.name.en) return;
+    debug.action('Tenants', `Updating tenant: ${editTarget.id}`);
     try {
       setError(null);
       await updateTenant(editTarget.id, editData);
+      debug.action('Tenants', `Tenant updated: ${editTarget.id}`);
       setEditOpen(false);
       load();
     } catch (e) {
+      debug.error('Tenants.update', e);
       setError("Failed to update tenant: " + e.message);
     }
   };
 
   // ── Toggle Status ─────────────────────────────────────────────────────────
   const toggleStatus = async (id, current) => {
+    debug.action('Tenants', `Toggling status: ${id} (${current} -> ${current === "ACTIVE" ? "INACTIVE" : "ACTIVE"})`);
     try {
       await updateTenantStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE");
+      debug.action('Tenants', `Status updated: ${id}`);
       load();
     } catch {
       setError("Failed to update status");
@@ -244,11 +261,14 @@ export default function Tenants() {
   // ── Delete ────────────────────────────────────────────────────────────────
   const handleDelete = async () => {
     if (!deleteConfirm) return;
+    debug.action('Tenants', `Deleting tenant: ${deleteConfirm.id}`);
     try {
       await deleteTenant(deleteConfirm.id);
+      debug.action('Tenants', `Tenant deleted: ${deleteConfirm.id}`);
       setDeleteConfirm(null);
       load();
     } catch (e) {
+      debug.error('Tenants.delete', e);
       setError("Failed to delete tenant: " + e.message);
     }
   };
