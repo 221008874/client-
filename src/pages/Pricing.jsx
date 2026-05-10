@@ -6,7 +6,7 @@ const plans = [
     name: 'Starter',
     nameAr: 'المبتدئ',
     desc: 'للعيادات الصغيرة والأطباء المنفردين',
-    price: 299,
+    price: 700,
     period: 'شهريًا',
     color: 'teal',
     features: [
@@ -24,7 +24,7 @@ const plans = [
     name: 'Professional',
     nameAr: 'الاحترافي',
     desc: 'للعيادات المتوسطة والمراكز الطبية',
-    price: 599,
+    price: 1000,
     period: 'شهريًا',
     color: 'blue',
     features: [

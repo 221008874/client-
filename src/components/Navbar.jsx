@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './Navbar.css';
+import logoSrc from '../assets/logo.png';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -24,11 +25,7 @@ export default function Navbar() {
         <a href="#" className="nav-logo">
           <div className="logo-icon">
             <span className="logo-pulse" />
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#060d18" strokeWidth="2" strokeLinejoin="round"/>
-              <path d="M2 17l10 5 10-5" stroke="#060d18" strokeWidth="2" strokeLinejoin="round"/>
-              <path d="M2 12l10 5 10-5" stroke="#060d18" strokeWidth="2" strokeLinejoin="round"/>
-            </svg>
+            <img src={logoSrc} alt="ZIARA" className="logo-img" />
           </div>
           <span className="logo-text">ZIARA</span>
         </a>
