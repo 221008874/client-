@@ -1,0 +1,114 @@
+import './Download.css';
+
+export default function Download() {
+  return (
+    <section className="download section-padding" id="download">
+      <div className="download-bg" aria-hidden="true">
+        <div className="dl-orb-1" />
+        <div className="dl-grid-overlay" />
+      </div>
+
+      <div className="container">
+        <div className="download-wrapper">
+          <div className="download-content animate-on-scroll">
+            <div className="tag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+              تحميل البرنامج
+            </div>
+            <h2 className="section-title">
+              حمّل برنامج
+              <br />
+              <span className="shimmer-text">ZIARA Smart Clinic</span>
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.8, marginBottom: 32 }}>
+              متوفر لويندوز مع تثبيت سهل وسريع. ابدأ تشغيله في دقائق.
+            </p>
+
+            <div className="requirements animate-on-scroll delay-1">
+              <div className="req-title">المتطلبات:</div>
+              <ul className="req-list">
+                <li>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                  Windows 10 أو أحدث
+                </li>
+                <li>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                  4 GB RAM على الأقل
+                </li>
+                <li>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                  اتصال إنترنت للمزامنة (اختياري)
+                </li>
+              </ul>
+            </div>
+
+            <div className="download-actions animate-on-scroll delay-2">
+              <a href="#" className="btn-primary dl-btn-main">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                تحميل البرنامج
+                <span className="dl-badge">v2.5.0</span>
+              </a>
+              <a href="#" className="btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2"/>
+                  <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                دليل التثبيت
+              </a>
+            </div>
+
+            <div className="dl-meta animate-on-scroll delay-3">
+              <span>📦 حجم الملف: 85 MB</span>
+              <span className="dl-sep">·</span>
+              <span>🔄 آخر تحديث: مايو 2025</span>
+              <span className="dl-sep">·</span>
+              <span>✅ آمن ومرخص</span>
+            </div>
+          </div>
+
+          {/* What's included */}
+          <div className="dl-includes animate-on-scroll delay-2">
+            <div className="dl-includes-title">
+              <span className="dl-check-icon">✓</span>
+              ما يشمله البرنامج
+            </div>
+            <div className="dl-items">
+              {[
+                { icon: '🏥', title: 'برنامج إدارة العيادة', desc: 'كامل الميزات' },
+                { icon: '📅', title: 'نظام الحجز والمواعيد', desc: 'ذكي وسريع' },
+                { icon: '🔄', title: 'المزامنة التلقائية', desc: 'مع السحابة' },
+                { icon: '📊', title: 'التقارير والإحصائيات', desc: 'PDF وExcel' },
+                { icon: '💾', title: 'النسخ الاحتياطي', desc: 'تلقائي يومياً' },
+                { icon: '🌐', title: 'ربط منصة زيارة', desc: 'حجز أونلاين' },
+              ].map(({ icon, title, desc }, i) => (
+                <div key={i} className={`dl-item animate-on-scroll delay-${i + 1}`}>
+                  <div className="dl-item-icon">{icon}</div>
+                  <div>
+                    <div className="dl-item-title">{title}</div>
+                    <div className="dl-item-desc">{desc}</div>
+                  </div>
+                  <div className="dl-item-check">✓</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="support-links">
+              <a href="#" className="support-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                تواصل مع الدعم
+              </a>
+              <a href="#" className="support-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                الأسئلة الشائعة
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
