@@ -102,7 +102,7 @@ export default function Guide() {
       { rootMargin: '-20% 0px -70% 0px' }
     );
     SECTIONS.forEach(({ id }) => {
-      const el = document.getElementById(id);
+      const el = document.getElementById(id); 
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
