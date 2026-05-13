@@ -8,15 +8,8 @@ const DOWNLOADS = [
 
 export default function Download() {
   const handleDownloadAll = () => {
-    DOWNLOADS.forEach(({ url }) => {
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    DOWNLOADS.forEach(({ url }, i) => {
+      setTimeout(() => { window.location.href = url; }, i * 1200);
     });
   };
 

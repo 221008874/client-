@@ -463,7 +463,7 @@ export default function Guide() {
                 <a href="#" className="btn-primary" style={{ padding: '14px 32px', fontSize: '0.95rem' }}>
                   تواصل مع الدعم الفني
                 </a>
-                <a href="#download" className="btn-secondary" style={{ padding: '14px 32px', fontSize: '0.95rem' }}>
+                <a href="/#download" className="btn-secondary" style={{ padding: '14px 32px', fontSize: '0.95rem' }}>
                   العودة للتحميل
                 </a>
               </div>

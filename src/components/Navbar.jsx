@@ -13,16 +13,16 @@ export default function Navbar() {
   }, []);
 
   const links = [
-    { href: '#features', label: 'المميزات' },
-    { href: '#about', label: 'عن النظام' },
-    { href: '#pricing', label: 'الأسعار' },
-    { href: '#download', label: 'التحميل' },
+    { href: '/#features', label: 'المميزات' },
+    { href: '/#about', label: 'عن النظام' },
+    { href: '/#pricing', label: 'الأسعار' },
+    { href: '/#download', label: 'التحميل' },
   ];
 
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
-        <a href="#" className="nav-logo">
+        <a href="/" className="nav-logo">
           <div className="logo-icon">
             <span className="logo-pulse" />
             <img src={logoSrc} alt="ZIARA" className="logo-img" />
@@ -41,7 +41,7 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-actions">
-          <a href="#download" className="btn-primary nav-cta">تحميل مجاني</a>
+          <a href="/#download" className="btn-primary nav-cta">تحميل مجاني</a>
           <button
             className={`hamburger ${menuOpen ? 'active' : ''}`}
             onClick={() => setMenuOpen(!menuOpen)}
