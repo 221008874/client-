@@ -1,6 +1,23 @@
+import { useCallback } from 'react';
 import './Download.css';
 
+const DOWNLOADS = [
+  { label: 'برنامج العيادة (DR)', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.DR.zip' },
+  { label: 'برنامج السكرتارية (SEC)', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.SEC.zip' },
+  { label: 'السيرفر (Server)', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.Server.zip' },
+];
+
 export default function Download() {
+  const handleDownloadAll = useCallback(() => {
+    DOWNLOADS.forEach(({ url }) => {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.click();
+    });
+  }, []);
+
   return (
     <section className="download section-padding" id="download">
       <div className="download-bg" aria-hidden="true">
@@ -45,24 +62,24 @@ export default function Download() {
             </div>
 
             <div className="download-actions animate-on-scroll delay-2">
-              <a href="#" className="btn-primary dl-btn-main">
+              <button onClick={handleDownloadAll} className="btn-primary dl-btn-main">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 تحميل البرنامج
                 <span className="dl-badge">v2.5.0</span>
-              </a>
-              <a href="#" className="btn-secondary">
+              </button>
+              <button onClick={handleDownloadAll} className="btn-secondary">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2"/>
                   <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2"/>
                 </svg>
-                دليل التثبيت
-              </a>
+                جميع ملفات التثبيت
+              </button>
             </div>
 
             <div className="dl-meta animate-on-scroll delay-3">
-              <span>📦 حجم الملف: 85 MB</span>
+              <span>📦 3 ملفات: DR · SEC · Server</span>
               <span className="dl-sep">·</span>
               <span>🔄 آخر تحديث: مايو 2025</span>
               <span className="dl-sep">·</span>
