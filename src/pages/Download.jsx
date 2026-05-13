@@ -13,8 +13,11 @@ export default function Download() {
   const handleDownloadAll = () => {
     if (downloading) return;
     setDownloading(true);
-    DOWNLOADS.forEach(({ url }, i) => {
-      setTimeout(() => { window.location.href = url; }, i * 1200);
+    DOWNLOADS.forEach(({ url }) => {
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
     });
     setTimeout(() => setDownloading(false), 3500);
   };
