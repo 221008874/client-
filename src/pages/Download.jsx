@@ -1,29 +1,12 @@
 import { useState } from 'react';
 import './Download.css';
 
-const DL_BASE = 'https://github.com/221008874/client-/releases/download/Ziara';
-const DOWNLOADS = [
-  { label: 'Ziara.DR.zip', url: `${DL_BASE}/Ziara.DR.zip` },
-  { label: 'Ziara.SEC.zip', url: `${DL_BASE}/Ziara.SEC.zip` },
-  { label: 'Ziara.Server.zip', url: `${DL_BASE}/Ziara.Server.zip` },
-];
-
 export default function Download() {
   const [downloading, setDownloading] = useState(false);
 
   const handleDownloadAll = () => {
-    if (downloading) return;
     setDownloading(true);
-    DOWNLOADS.forEach(({ label, url }) => {
-      const a = document.createElement('a');
-      a.href = `/api/dl?url=${encodeURIComponent(url)}`;
-      a.download = label;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    });
-    setTimeout(() => setDownloading(false), 3500);
+    window.location.href = '/downloads';
   };
 
   return (
