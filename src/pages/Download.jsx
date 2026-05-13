@@ -1,22 +1,15 @@
-import { useCallback } from 'react';
 import './Download.css';
 
 const DOWNLOADS = [
-  { label: 'برنامج العيادة (DR)', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.DR.zip' },
-  { label: 'برنامج السكرتارية (SEC)', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.SEC.zip' },
-  { label: 'السيرفر (Server)', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.Server.zip' },
+  { label: 'Ziara.DR.zip', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.DR.zip' },
+  { label: 'Ziara.SEC.zip', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.SEC.zip' },
+  { label: 'Ziara.Server.zip', url: 'https://github.com/221008874/client-/releases/download/Ziara/Ziara.Server.zip' },
 ];
 
 export default function Download() {
-  const handleDownloadAll = useCallback(() => {
-    DOWNLOADS.forEach(({ url }) => {
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.click();
-    });
-  }, []);
+  const handleDownloadAll = () => {
+    DOWNLOADS.forEach(({ url }) => window.open(url, '_blank'));
+  };
 
   return (
     <section className="download section-padding" id="download">
@@ -69,13 +62,14 @@ export default function Download() {
                 تحميل البرنامج
                 <span className="dl-badge">v2.5.0</span>
               </button>
-              <button onClick={handleDownloadAll} className="btn-secondary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2"/>
-                  <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-                جميع ملفات التثبيت
-              </button>
+              
+              <a href="/guide" className="btn-secondary">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M12 8v4l3 3" stroke="currentColor" strokeWidth="2"/>
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+  </svg>
+  دليل الاستخدام
+</a>
             </div>
 
             <div className="dl-meta animate-on-scroll delay-3">
