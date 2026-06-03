@@ -1,12 +1,22 @@
 import { useState } from 'react';
 import './Download.css';
 
-export default function Download() {
-  const [downloading, setDownloading] = useState(false);
+const APPS = [
+  { key: 'dr', icon: '🩺', label: 'Ziara DR', desc: 'تطبيق الطبيب — إدارة المرضى والمواعيد والتقارير' },
+  { key: 'sec', icon: '📋', label: 'Ziara SEC', desc: 'تطبيق السكرتيرة — استقبال وإدارة طابور الانتظار' },
+  { key: 'server', icon: '🖥️', label: 'Ziara Server', desc: 'السيرفر المركزي — يجب تشغيله أولاً' },
+];
 
-  const handleDownloadAll = () => {
-    setDownloading(true);
-    window.location.href = '/downloads';
+export default function Download() {
+  const [checked, setChecked] = useState({ dr: true, sec: true, server: true });
+
+  const toggle = (key) => setChecked((c) => ({ ...c, [key]: !c[key] }));
+
+  const selected = APPS.filter((a) => checked[a.key]);
+  const handleDownload = () => {
+    if (selected.length === 0) return;
+    const files = selected.map((a) => a.key).join(',');
+    window.location.href = `/downloads?files=${files}`;
   };
 
   return (
@@ -31,8 +41,29 @@ export default function Download() {
               <span className="shimmer-text">ZIARA Smart Clinic</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.8, marginBottom: 32 }}>
-              متوفر لويندوز مع تثبيت سهل وسريع. ابدأ تشغيله في دقائق.
+              اختر المكونات التي تريد تحميلها ثم اضغط التحميل.
             </p>
+
+            <div className="app-checkboxes animate-on-scroll delay-1">
+              {APPS.map((app) => (
+                <label key={app.key} className={`app-checkbox ${checked[app.key] ? 'checked' : ''}`} onClick={() => toggle(app.key)}>
+                  <div className="app-cb-display">
+                    <span className={`cb-box ${checked[app.key] ? 'on' : ''}`}>
+                      {checked[app.key] && (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </span>
+                  </div>
+                  <div className="app-cb-icon">{app.icon}</div>
+                  <div className="app-cb-info">
+                    <div className="app-cb-title">{app.label}</div>
+                    <div className="app-cb-desc">{app.desc}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
 
             <div className="requirements animate-on-scroll delay-1">
               <div className="req-title">المتطلبات:</div>
@@ -53,46 +84,30 @@ export default function Download() {
             </div>
 
             <div className="download-actions animate-on-scroll delay-2">
-              <button onClick={handleDownloadAll} className="btn-primary dl-btn-main" disabled={downloading}>
-                {downloading ? (
-                  <>
-                    <svg className="dl-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4 31.4" strokeLinecap="round" />
-                    </svg>
-                    جاري التحميل…
-                  </>
-                ) : (
-                  <>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    تحميل البرنامج
-                    <span className="dl-badge">v2.5.0</span>
-                  </>
-                )}
+              <button onClick={handleDownload} className="btn-primary dl-btn-main" disabled={selected.length === 0}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                تحميل المحدد ({selected.length})
               </button>
-              
+
               <a href="/guide" className="btn-secondary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 8v4l3 3" stroke="currentColor" strokeWidth="2"/>
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 8v4l3 3"/>
                 </svg>
                 دليل الاستخدام
               </a>
             </div>
 
             <div className="dl-meta animate-on-scroll delay-3">
-              {downloading ? (
-                <span style={{ color: 'var(--accent-teal)' }}>🔄 يتم تجهيز التحميل… (DR · SEC · Server)</span>
-              ) : (
-                <>
-                  <span>📦 3 ملفات: DR · SEC · Server</span>
-                  <span className="dl-sep">·</span>
-                  <span>🔄 آخر تحديث: مايو 2025</span>
-                  <span className="dl-sep">·</span>
-                  <span>✅ آمن ومرخص</span>
-                </>
-              )}
+              <span>📦 {selected.length} ملف/ملفات محددة</span>
+              <span className="dl-sep">·</span>
+              <span>🔄 آخر تحديث: مايو 2025</span>
+              <span className="dl-sep">·</span>
+              <span>✅ آمن ومرخص</span>
             </div>
           </div>
 
