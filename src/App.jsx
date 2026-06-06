@@ -5,6 +5,7 @@ import Features from "./pages/Features";
 import About from "./pages/About";
 import Trust from "./pages/Trust";
 import Pricing from "./pages/Pricing";
+import VideoSection from "./pages/VideoSection";
 import Download from "./pages/Download";
 import Footer from "./pages/Footer";
 import Guide from "./pages/Guide";
@@ -19,6 +20,7 @@ function MainPage() {
       <About />
       <Trust />
       <Pricing />
+      <VideoSection />
       <Download />
     </main>
   );
