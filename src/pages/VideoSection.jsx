@@ -3,11 +3,6 @@ import './VideoSection.css';
 export default function VideoSection() {
   return (
     <section className="video-section section-padding" id="video">
-      <div className="video-bg" aria-hidden="true">
-        <div className="vid-orb-1" />
-        <div className="vid-orb-2" />
-      </div>
-
       <div className="container">
         <div className="video-header animate-on-scroll">
           <div className="tag">
@@ -20,7 +15,7 @@ export default function VideoSection() {
           <h2 className="section-title">
             Ziara Smart Clinic
             <br />
-            <span className="shimmer-text">في دقيقة واحدة</span>
+            <span className="gradient-text">في دقيقة واحدة</span>
           </h2>
         </div>
 
@@ -40,7 +35,7 @@ export default function VideoSection() {
           </div>
 
           <div className="video-caption">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <polygon points="10 8 16 12 10 16 10 8" />
             </svg>

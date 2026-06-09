@@ -107,11 +107,6 @@ const features = [
 export default function Features() {
   return (
     <section className="features section-padding" id="features">
-      {/* Background decoration */}
-      <div className="features-bg" aria-hidden="true">
-        <div className="features-orb" />
-      </div>
-
       <div className="container">
         <div className="features-header animate-on-scroll">
           <div className="tag">
@@ -138,7 +133,6 @@ export default function Features() {
             >
               <div className={`feat-icon-wrap feat-icon-${feat.color}`}>
                 {feat.icon}
-                <div className={`feat-icon-glow feat-glow-${feat.color}`} />
               </div>
               <div className="feat-content">
                 <div className="feat-top">

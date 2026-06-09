@@ -33,7 +33,7 @@ export default function Download() {
             <h2 className="section-title">
               حمّل برنامج
               <br />
-              <span className="shimmer-text">ZIARA Smart Clinic</span>
+              <span className="gradient-text">ZIARA Smart Clinic</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.8, marginBottom: 32 }}>
               اختر المكونات التي تريد تحميلها ثم اضغط التحميل.
@@ -64,15 +64,15 @@ export default function Download() {
               <div className="req-title">المتطلبات:</div>
               <ul className="req-list">
                 <li>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
                   Windows 10 أو أحدث
                 </li>
                 <li>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
                   4 GB RAM على الأقل
                 </li>
                 <li>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
                   اتصال إنترنت للمزامنة (اختياري)
                 </li>
               </ul>

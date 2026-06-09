@@ -40,8 +40,6 @@
 .feat-icon-blue { background: rgba(91,141,239,0.12); color: var(--accent-blue); }
 .feat-icon-gold { background: rgba(232,168,56,0.12); color: var(--warning); }
 
-.feat-icon-glow { display: none; }
-
 .feat-content { flex: 1; }
 .feat-top {
   display: flex;

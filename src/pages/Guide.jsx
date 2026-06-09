@@ -234,7 +234,7 @@ export default function Guide() {
                       <p>انقر بزر الماوس الأيمن على كل ملف ZIP ← اختر "استخراج هنا" أو "Extract Here". يُفضَّل استخراجها في مجلد مثل <code style={{ background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: 4, fontSize: '0.8rem' }}>C:\Ziara</code>.</p>
                     </StepRow>
                     <StepRow num="3" title="شغّل السيرفر أولاً">
-                      <p>ادخل على مجلد Ziara Server وانقر مرتين على <strong style={{ color: 'var(--text-primary)' }}>Ziara Server.exe</strong>. سيفتح نافذة تحكم. اضغط <strong style={{ color: 'var(--accent-teal)' }}>Start Server</strong>.</p>
+                      <p>ادخل على مجلد Ziara Server وانقر مرتين على <strong style={{ color: 'var(--text-primary)' }}>Ziara Server.exe</strong>. سيفتح نافذة تحكم. اضغط <strong style={{ color: 'var(--accent)' }}>Start Server</strong>.</p>
                       <div className="step-tip">
                         <span className="tip-icon">💡</span>
                         <p>لاحظ الـ <strong>IP</strong> والـ <strong>Port</strong> المكتوبين في نافذة السيرفر — ستحتاجهم في الخطوة التالية.</p>
@@ -283,7 +283,7 @@ export default function Guide() {
                       <p>انقر مرتين على <strong style={{ color: 'var(--text-primary)' }}>Ziara Server.exe</strong> — ستفتح نافذة لوحة التحكم.</p>
                     </StepRow>
                     <StepRow num="2" title="تشغيل السيرفر">
-                      <p>اضغط على زر <strong style={{ color: 'var(--accent-teal)' }}>Start Server</strong> داخل النافذة. انتظر بضع ثوانٍ حتى يظهر أنه يعمل.</p>
+                      <p>اضغط على زر <strong style={{ color: 'var(--accent)' }}>Start Server</strong> داخل النافذة. انتظر بضع ثوانٍ حتى يظهر أنه يعمل.</p>
                     </StepRow>
                     <StepRow num="3" title="لاحظ الـ IP والـ Port" isLast>
                       <p>ستجد في النافذة عنوان IP وPort مثل <code style={{ background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: 4, fontSize: '0.8rem' }}>192.168.1.5 : 8080</code>. احتفظ بهذه المعلومة لإعداد التطبيقات الأخرى.</p>

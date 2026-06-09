@@ -151,21 +151,21 @@ export default function Pricing() {
 
         <div className="pricing-footer animate-on-scroll">
           <div className="pricing-note">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
               <circle cx="12" cy="12" r="10"/>
               <path d="M9 12l2 2 4-4"/>
             </svg>
             <span>جرّب مجانًا لمدة 30 يوم بدون بيانات بنكية</span>
           </div>
           <div className="pricing-note">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
               <circle cx="12" cy="12" r="10"/>
               <path d="M9 12l2 2 4-4"/>
             </svg>
             <span>دعم فني طوال فترة الاشتراك</span>
           </div>
           <div className="pricing-note">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
               <circle cx="12" cy="12" r="10"/>
               <path d="M9 12l2 2 4-4"/>
             </svg>

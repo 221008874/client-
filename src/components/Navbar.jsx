@@ -24,7 +24,6 @@ export default function Navbar() {
       <div className="nav-container">
         <a href="/" className="nav-logo">
           <div className="logo-icon">
-            <span className="logo-pulse" />
             <img src={logoSrc} alt="ZIARA" className="logo-img" />
           </div>
           <span className="logo-text">ZIARA</span>

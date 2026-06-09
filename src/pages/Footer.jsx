@@ -13,15 +13,14 @@ export default function Footer() {
       <section className="cta-section">
         <div className="container">
           <div className="cta-box animate-on-scroll">
-            <div className="cta-glow-border" />
             <div className="tag cta-tag">
-              <span style={{ animation: 'blink 1.5s infinite', display: 'inline-block', width: 8, height: 8, background: 'var(--accent-teal)', borderRadius: '50%' }} />
+              <span style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--accent)', borderRadius: '50%', marginLeft: 8 }} />
               ابدأ اليوم
             </div>
             <h2 className="cta-title">
               ابدأ تطوير عيادتك
               <br />
-              <span className="shimmer-text">اليوم</span>
+              <span className="gradient-text">اليوم</span>
             </h2>
             <p className="cta-desc">
               نظام بسيط وسريع يساعدك تدير العيادة بشكل احترافي.
@@ -53,7 +52,7 @@ export default function Footer() {
 
       {/* Footer */}
       <footer className="footer">
-        <div className="footer-top-line" />
+
         <div className="container">
           <div className="footer-grid">
             <div className="footer-brand">
