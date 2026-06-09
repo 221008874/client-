@@ -11,11 +11,6 @@ export default function Footer() {
     <>
       {/* CTA Section */}
       <section className="cta-section">
-        <div className="cta-bg" aria-hidden="true">
-          <div className="cta-orb-1" />
-          <div className="cta-orb-2" />
-          <div className="cta-lines" />
-        </div>
         <div className="container">
           <div className="cta-box animate-on-scroll">
             <div className="cta-glow-border" />

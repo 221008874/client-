@@ -134,7 +134,7 @@ export default function Features() {
           {features.map((feat, i) => (
             <div
               key={i}
-              className={`feature-card animate-on-scroll delay-${(i % 4) + 1} ${i === 3 ? 'featured' : ''}`}
+              className={`feature-card animate-on-scroll delay-${(i % 4) + 1}`}
             >
               <div className={`feat-icon-wrap feat-icon-${feat.color}`}>
                 {feat.icon}
@@ -147,9 +147,7 @@ export default function Features() {
                 </div>
                 <p className="feat-desc">{feat.desc}</p>
               </div>
-              {i === 3 && (
-                <div className="featured-badge">⚡ الميزة الفريدة</div>
-              )}
+
             </div>
           ))}
         </div>

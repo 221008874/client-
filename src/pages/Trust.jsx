@@ -12,11 +12,6 @@ const trustPoints = [
 export default function Trust() {
   return (
     <section className="trust section-padding">
-      <div className="trust-bg" aria-hidden="true">
-        <div className="trust-line trust-line-1" />
-        <div className="trust-line trust-line-2" />
-      </div>
-
       <div className="container">
         {/* Stats band */}
         <div className="stats-band animate-on-scroll">
@@ -65,8 +60,6 @@ export default function Trust() {
 
           <div className="trust-visual animate-on-scroll delay-2">
             <div className="trust-card-stack">
-              <div className="trust-card-bg trust-card-bg-2" />
-              <div className="trust-card-bg trust-card-bg-1" />
               <div className="trust-main-card">
                 <div className="trust-card-header">
                   <div className="trust-avatar">

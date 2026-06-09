@@ -65,10 +65,6 @@ export default function Pricing() {
 
   return (
     <section className="pricing section-padding" id="pricing">
-      <div className="pricing-bg" aria-hidden="true">
-        <div className="pricing-orb" />
-      </div>
-
       <div className="container">
         <div className="pricing-header animate-on-scroll" style={{ textAlign: 'center' }}>
           <div className="tag">

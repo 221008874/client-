@@ -3,17 +3,6 @@ import './Hero.css';
 export default function Hero() {
   return (
     <section className="hero" id="hero">
-      {/* Grid background */}
-      <div className="hero-grid" aria-hidden="true">
-        <div className="grid-lines-h" />
-        <div className="grid-lines-v" />
-      </div>
-
-      {/* Glowing orbs */}
-      <div className="orb orb-1" aria-hidden="true" />
-      <div className="orb orb-2" aria-hidden="true" />
-      <div className="orb orb-3" aria-hidden="true" />
-
       <div className="container hero-container">
         {/* Left - Content */}
         <div className="hero-content animate-fade-up">
@@ -170,15 +159,7 @@ export default function Hero() {
                 <div className="float-sub">زيادة في الإنتاجية</div>
               </div>
             </div>
-            <div className="float-card float-card-2">
-              <div className="float-icon offline-icon-float">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#060d18" strokeWidth="2.5"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9"/></svg>
-              </div>
-              <div>
-                <div className="float-title">بدون إنترنت</div>
-                <div className="float-sub">مزامنة تلقائية</div>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>

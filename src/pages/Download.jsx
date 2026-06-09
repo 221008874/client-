@@ -21,11 +21,6 @@ export default function Download() {
 
   return (
     <section className="download section-padding" id="download">
-      <div className="download-bg" aria-hidden="true">
-        <div className="dl-orb-1" />
-        <div className="dl-grid-overlay" />
-      </div>
-
       <div className="container">
         <div className="download-wrapper">
           <div className="download-content animate-on-scroll">

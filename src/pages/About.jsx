@@ -3,11 +3,6 @@ import './About.css';
 export default function About() {
   return (
     <section className="about section-padding" id="about">
-      <div className="about-bg" aria-hidden="true">
-        <div className="about-orb-1" />
-        <div className="about-orb-2" />
-      </div>
-
       <div className="container">
         <div className="about-grid">
           {/* Left - Visual */}
