@@ -99,6 +99,7 @@
 .pillar:hover {
   border-color: var(--border);
   background: var(--bg-card-hover);
+  transform: translateX(-3px);
 }
 .pillar-icon {
   font-size: 1.3rem;

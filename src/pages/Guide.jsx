@@ -110,13 +110,6 @@ export default function Guide() {
 
   return (
     <div className="guide-page">
-      {/* Background */}
-      <div className="guide-bg" aria-hidden="true">
-        <div className="guide-orb-1" />
-        <div className="guide-orb-2" />
-        <div className="guide-grid" />
-      </div>
-
       {/* ── Hero ── */}
       <div className="guide-hero">
         <div className="container">

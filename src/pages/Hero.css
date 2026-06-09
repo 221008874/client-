@@ -249,7 +249,6 @@
   white-space: nowrap;
 }
 .float-card-1 { bottom: -16px; right: -24px; animation: float 6s ease-in-out infinite; }
-.float-card-2 { display: none; }
 .float-icon {
   width: 30px; height: 30px;
   background: linear-gradient(135deg, var(--accent), var(--accent-dim));

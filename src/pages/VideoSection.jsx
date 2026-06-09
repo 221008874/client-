@@ -21,7 +21,6 @@ export default function VideoSection() {
 
         <div className="video-wrapper animate-on-scroll delay-1">
           <div className="video-frame">
-            <div className="video-frame-glow" />
             <video
               className="video-player"
               src="https://res.cloudinary.com/djwunhtu8/video/upload/v1780725529/0606_1_fueaz5.mp4"

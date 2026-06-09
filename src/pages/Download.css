@@ -84,7 +84,7 @@
   border: 1px solid rgba(255,255,255,0.03);
   transition: all 0.25s ease;
 }
-.dl-item:hover { background: rgba(212,153,59,0.04); border-color: rgba(212,153,59,0.12); }
+.dl-item:hover { background: rgba(212,153,59,0.04); border-color: rgba(212,153,59,0.12); transform: translateX(-3px); }
 .dl-item-icon { font-size: 1.15rem; flex-shrink: 0; width: 26px; text-align: center; }
 .dl-item-title { font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; color: var(--text-primary); }
 .dl-item-desc { font-size: 0.68rem; color: var(--text-muted); }
@@ -125,6 +125,7 @@
 .app-checkbox:hover {
   border-color: var(--border);
   background: var(--bg-card-hover);
+  transform: translateY(-1px);
 }
 .app-checkbox.checked {
   border-color: rgba(212,153,59,0.3);

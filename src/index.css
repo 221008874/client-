@@ -68,7 +68,7 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
-  line-height: 1.7;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 ::-webkit-scrollbar { width: 6px; }
@@ -105,6 +105,7 @@ body {
 }
 .btn-primary:hover::before { transform: translateX(100%); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(212, 153, 59, 0.35); }
+.btn-primary:active { transform: translateY(0); box-shadow: 0 4px 16px rgba(212, 153, 59, 0.25); }
 
 .btn-secondary {
   display: inline-flex; align-items: center; gap: 10px;
@@ -115,6 +116,7 @@ body {
   cursor: pointer; transition: all 0.25s ease; text-decoration: none;
 }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); transform: translateY(-2px); }
+.btn-secondary:active { transform: translateY(0); }
 
 /* ── Tag / Badge ── */
 .tag {
@@ -141,6 +143,14 @@ body {
 .animate-on-scroll.delay-6 { transition-delay: 0.48s; }
 
 /* ── Responsive ── */
+/* ── Focus-visible ── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* ── Selection ── */
+::selection { background: var(--accent-dim); color: var(--text-primary); }
+
 @media (max-width: 768px) {
   .section-padding { padding: var(--space-16) 0; }
 }
