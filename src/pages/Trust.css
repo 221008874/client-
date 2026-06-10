@@ -10,8 +10,8 @@
 .stats-inner {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -25,10 +25,10 @@
   content: '';
   position: absolute;
   top: 20%; left: 0;
-  height: 60%; width: 1px;
-  background: var(--border-subtle);
+  height: 60%; width: 1px
+  background: var(--border);
 }
-.band-stat:hover { background: var(--bg-card-hover); }
+.band-stat:hover { background: var(--accent-glow); }
 .band-num {
   font-family: var(--font-display);
   font-size: 2.2rem;
@@ -37,7 +37,7 @@
   margin-bottom: var(--space-2);
 }
 .band-stat-teal .band-num { color: var(--accent); }
-.band-stat-blue .band-num { color: var(--accent-blue); }
+.band-stat-blue .band-num { color: var(--accent-secondary); }
 .band-stat-gold .band-num { color: var(--warning); }
 .band-label { font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-display); }
 
@@ -60,19 +60,18 @@
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-4);
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   transition: all 0.25s ease;
 }
 .trust-point:hover {
-  border-color: var(--border);
-  background: var(--bg-card-hover);
+  border-color: var(--accent);
   transform: translateY(-2px);
 }
 .trust-icon { font-size: 1.3rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
-.trust-point-title { font-family: var(--font-display); font-size: 0.82rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
-.trust-point-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+.trust-point-title { font-family: var(--font-display); font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.trust-point-desc { font.size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
 
 /* Card — simplified, no stacked cards */
 .trust-visual { display: flex; justify-content: center; }
@@ -81,8 +80,8 @@
 .trust-card-bg { display: none; }
 
 .trust-main-card {
-  background: var(--bg-card);
-  border: 1px solid rgba(212,153,59,0.15);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-8);
   position: relative;
@@ -98,19 +97,19 @@
 }
 .trust-avatar {
   width: 44px; height: 44px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-size: 1.1rem; font-weight: 800;
-  color: #0a0a0f; flex-shrink: 0;
+  color: var(--text-white); flex-shrink: 0;
 }
-.trust-doc-name { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+.trust-doc-name { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--text); }
 .trust-doc-spec { font-size: 0.72rem; color: var(--text-muted); }
 .trust-verified {
   display: flex; align-items: center; gap: 4px;
   margin-right: auto;
-  background: rgba(212,153,59,0.08);
-  border: 1px solid rgba(212,153,59,0.2);
+  background: var(--accent-glow);
+  border: 1px solid rgba(20, 184, 166, 0.2);
   border-radius: var(--radius-full);
   padding: 4px 10px;
   font-size: 0.68rem;
@@ -126,7 +125,7 @@
   margin-bottom: var(--space-4);
   font-style: italic;
   padding: var(--space-4);
-  background: rgba(0,0,0,0.2);
+  background: var(--accent-glow);
   border-radius: var(--radius-sm);
   border-right: 3px solid var(--accent);
 }
@@ -138,14 +137,14 @@
   grid-template-columns: repeat(3,1fr);
   gap: var(--space-3);
   padding-top: var(--space-5);
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border);
 }
 .metric { text-align: center; }
 .metric-val { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; }
 .metric-val.teal { color: var(--accent); }
-.metric-val.blue { color: var(--accent-blue); }
+.metric-val.blue { color: var(--accent-secondary); }
 .metric-val.gold { color: var(--warning); }
-.metric-lbl { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; font-family: var(--font-display); }
+.metric-lbl { font.size: 0.68rem; color: var(--text-muted); margin-top: 3px; font-family: var(--font-display); }
 
 @media (max-width: 900px) {
   .stats-inner { grid-template-columns: repeat(2, 1fr); }
