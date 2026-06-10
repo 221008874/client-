@@ -123,14 +123,14 @@ export default function Hero() {
                     { init: 'خ', name: 'خالد علي', time: '1:00 م', badge: 'منتهي', color: 'rgba(255,255,255,0.3)' },
                   ].map((apt, i) => (
                     <div key={i} className="ui-apt-item" style={{ animationDelay: `${0.5 + i * 0.15}s` }}>
-                      <div className="apt-avatar" style={{ background: apt.color === 'teal' ? 'rgba(212,153,59,0.2)' : apt.color === 'blue' ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.1)', color: apt.color === 'teal' ? 'var(--accent)' : apt.color === 'blue' ? 'var(--accent-blue)' : 'var(--text-muted)' }}>
+                      <div className="apt-avatar" style={{ background: apt.color === 'teal' ? 'rgba(20, 184, 166, 0.2)' : apt.color === 'blue' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(15, 23, 42, 0.1)', color: apt.color === 'teal' ? 'var(--accent)' : apt.color === 'blue' ? 'var(--accent-secondary)' : 'var(--text-muted)' }}>
                         {apt.init}
                       </div>
                       <div className="apt-info">
                         <div className="apt-name">{apt.name}</div>
                         <div className="apt-meta">{apt.time}</div>
                       </div>
-                      <span className="apt-badge" style={{ background: apt.color === 'teal' ? 'rgba(212,153,59,0.15)' : apt.color === 'blue' ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.08)', color: apt.color === 'teal' ? 'var(--accent)' : apt.color === 'blue' ? 'var(--accent-blue)' : 'var(--text-muted)' }}>
+                      <span className="apt-badge" style={{ background: apt.color === 'teal' ? 'rgba(20, 184, 166, 0.15)' : apt.color === 'blue' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(15, 23, 42, 0.08)', color: apt.color === 'teal' ? 'var(--accent)' : apt.color === 'blue' ? 'var(--accent-secondary)' : 'var(--text-muted)' }}>
                         {apt.badge}
                       </span>
                     </div>
