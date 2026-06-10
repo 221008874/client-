@@ -57,7 +57,7 @@
   border-color: var(--accent);
   transform: scale(1.06);
 }
-.arch-node-label { font-family: var(--font-display); font.size: 0.58rem; color: var(--text-secondary); white-space: nowrap; font-weight: 600; }
+.arch-node-label { font-family: var(--font-display); font-size: 0.58rem; color: var(--text-secondary); white-space: nowrap; font-weight: 600; }
 
 .arch-node-1 { top: 10px; right: 20px; }
 .arch-node-2 { top: 10px; left: 20px; }

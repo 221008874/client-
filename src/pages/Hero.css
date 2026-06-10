@@ -161,7 +161,7 @@
   justify-content: space-between;
   padding: 12px 16px;
   background: rgba(0,0,0,0.3);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .screen-dots { display: flex; gap: 5px; }
 .screen-dots span {
@@ -180,7 +180,7 @@
 .ui-stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
 .ui-stat-card {
   background: rgba(0,0,0,0.3);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255,255,255,0.06);
   border-radius: var(--radius-sm);
   padding: 10px;
   display: flex;
@@ -233,7 +233,7 @@
 }
 .sync-indicator { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 0.65rem; color: var(--accent); }
 .sync-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
-.sync-time { font.size: 0.6rem; color: var(--text-muted); font-family: var(--font-display); }
+.sync-time { font-size: 0.6rem; color: var(--text-muted); font-family: var(--font-display); }
 
 /* Floating cards — simplified to 1 */
 .float-card {
@@ -258,7 +258,7 @@
   color: var(--text-white); font-weight: 800;
 }
 .float-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; color: var(--text); }
-.float-sub { font.size: 0.62rem; color: var(--text-muted); }
+.float-sub { font-size: 0.62rem; color: var(--text-muted); }
 
 /* Scroll indicator */
 .scroll-indicator {

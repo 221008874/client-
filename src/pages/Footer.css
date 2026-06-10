@@ -11,8 +11,8 @@
   max-width: 640px;
   margin: 0 auto;
   padding: var(--space-16) var(--space-10);
-  background: var(--bg-card);
-  border: 1px solid rgba(212,153,59,0.15);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   overflow: hidden;
 }
@@ -24,7 +24,7 @@
   font-weight: 900;
   line-height: 1.2;
   margin-bottom: var(--space-5);
-  color: var(--text-primary);
+  color: var(--text);
 }
 .cta-desc {
   font-size: 1.02rem;
@@ -54,8 +54,8 @@
 
 /* Footer */
 .footer {
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border-subtle);
+  background: var(--primary);
+  border-top: 1px solid rgba(255,255,255,0.06);
   padding: var(--space-20) 0 0;
   position: relative;
 }
@@ -75,7 +75,7 @@
 }
 .footer-logo-icon {
   width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   border-radius: var(--radius-sm);
   display: flex; align-items: center; justify-content: center;
 }
@@ -83,32 +83,32 @@
   font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 900;
-  color: var(--text-primary);
+  color: var(--text-white);
   letter-spacing: 1px;
 }
-.footer-brand-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-5); }
+.footer-brand-desc { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: var(--space-5); }
 
 .footer-socials { display: flex; gap: var(--space-2); margin-bottom: var(--space-5); }
 .social-link {
   width: 34px; height: 34px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: var(--radius-sm);
   display: flex; align-items: center; justify-content: center;
   transition: all 0.25s ease;
   text-decoration: none;
 }
 .social-link:hover { border-color: var(--accent); background: var(--accent-glow); }
-.social-icon-placeholder { width: 13px; height: 13px; background: var(--text-muted); border-radius: 3px; }
+.social-icon-placeholder { width: 13px; height: 13px; background: rgba(255,255,255,0.3); border-radius: 3px; }
 
 .footer-contact { display: flex; flex-direction: column; gap: var(--space-2); }
-.contact-item { display: flex; align-items: center; gap: var(--space-2); font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-display); }
+.contact-item { display: flex; align-items: center; gap: var(--space-2); font-size: 0.78rem; color: rgba(255,255,255,0.5); font-family: var(--font-display); }
 
 .footer-col-title {
   font-family: var(--font-display);
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-white);
   margin-bottom: var(--space-5);
   position: relative;
 }
@@ -122,7 +122,7 @@
 }
 .footer-links { list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
 .footer-link {
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.5);
   text-decoration: none;
   font-size: 0.85rem;
   font-family: var(--font-display);
@@ -131,7 +131,7 @@
 }
 .footer-link:hover { color: var(--accent); transform: translateX(-3px); }
 
-.footer-bottom-line { height: 1px; background: var(--border-subtle); margin-bottom: var(--space-6); }
+.footer-bottom-line { height: 1px; background: rgba(255,255,255,0.06); margin-bottom: var(--space-6); }
 .footer-bottom-content {
   display: flex;
   align-items: center;
@@ -140,7 +140,7 @@
   flex-wrap: wrap;
   gap: var(--space-4);
 }
-.footer-copy { font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-display); }
+.footer-copy { font-size: 0.78rem; color: rgba(255,255,255,0.4); font-family: var(--font-display); }
 .footer-badges { display: flex; gap: var(--space-3); }
 .footer-badge {
   display: flex;
@@ -148,14 +148,14 @@
   gap: var(--space-2);
   font-family: var(--font-display);
   font-size: 0.7rem;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.5);
   padding: 4px 10px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: var(--radius-full);
 }
 .badge-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
-.badge-dot-blue { background: var(--accent-blue); }
+.badge-dot-blue { background: var(--accent-secondary); }
 
 @media (max-width: 900px) {
   .footer-grid { grid-template-columns: 1fr 1fr; }

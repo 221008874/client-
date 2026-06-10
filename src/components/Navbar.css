@@ -9,10 +9,10 @@
 }
 
 .navbar.scrolled {
-  background: rgba(10, 10, 15, 0.92);
+  background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   padding: 14px 0;
 }
 
@@ -37,7 +37,7 @@
 .logo-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@
   font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 900;
-  color: var(--text-primary);
+  color: var(--text-white);
   letter-spacing: 1px;
 }
 
@@ -107,7 +107,7 @@
   display: block;
   width: 22px;
   height: 2px;
-  background: var(--text-primary);
+  background: var(--text-white);
   border-radius: 2px;
   transition: all 0.3s ease;
 }
@@ -121,14 +121,14 @@
   .nav-links {
     position: fixed;
     top: 68px; left: 0; right: 0;
-    background: rgba(10, 10, 15, 0.98);
+    background: rgba(15, 23, 42, 0.98);
     backdrop-filter: blur(20px);
     flex-direction: column;
     padding: var(--space-5);
     gap: var(--space-2);
     transform: translateY(-120%);
     transition: transform 0.35s ease;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
   }
   .nav-links.open { transform: translateY(0); }
   .nav-link { width: 100%; text-align: center; padding: 14px; }

@@ -98,7 +98,7 @@
 
 .plan-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
 .plan-name { font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; color: var(--text); }
-.plan-name-en { font.size: 0.72rem; color: var(--text-muted); font-family: var(--font-display); margin-top: 2px; }
+.plan-name-en { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-display); margin-top: 2px; }
 
 .plan-desc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-6); }
 

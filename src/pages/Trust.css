@@ -25,7 +25,7 @@
   content: '';
   position: absolute;
   top: 20%; left: 0;
-  height: 60%; width: 1px
+  height: 60%; width: 1px;
   background: var(--border);
 }
 .band-stat:hover { background: var(--accent-glow); }
@@ -71,7 +71,7 @@
 }
 .trust-icon { font-size: 1.3rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
 .trust-point-title { font-family: var(--font-display); font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-.trust-point-desc { font.size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+.trust-point-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
 
 /* Card — simplified, no stacked cards */
 .trust-visual { display: flex; justify-content: center; }
@@ -144,7 +144,7 @@
 .metric-val.teal { color: var(--accent); }
 .metric-val.blue { color: var(--accent-secondary); }
 .metric-val.gold { color: var(--warning); }
-.metric-lbl { font.size: 0.68rem; color: var(--text-muted); margin-top: 3px; font-family: var(--font-display); }
+.metric-lbl { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; font-family: var(--font-display); }
 
 @media (max-width: 900px) {
   .stats-inner { grid-template-columns: repeat(2, 1fr); }
