@@ -104,11 +104,11 @@ export default function Download() {
               <span>🔄 آخر تحديث: مايو 2025</span>
               <span className="dl-sep">·</span>
               <span>✅ آمن ومرخص</span>
-            </div>
+            </ScrollReveal>
           </ScrollReveal>
 
           {/* What's included */}
-          <div className="dl-includes animate-on-scroll delay-2">
+          <ScrollReveal className="dl-includes" delay={0.2}>
             <div className="dl-includes-title">
               <span className="dl-check-icon">✓</span>
               ما يشمله البرنامج
