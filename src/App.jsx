@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "motion/react";
+import { pageTransition } from "./motion/motionSystem";
 import Navbar from "./components/Navbar";
 import Hero from "./pages/Hero";
 import Features from "./pages/Features";
@@ -9,10 +11,8 @@ import VideoSection from "./pages/VideoSection";
 import Download from "./pages/Download";
 import Footer from "./pages/Footer";
 import Guide from "./pages/Guide";
-import { useScrollAnimation } from "./animation/Usescrollanimation";
 
 function MainPage() {
-  useScrollAnimation();
   return (
     <main>
       <Hero />
@@ -26,14 +26,31 @@ function MainPage() {
   );
 }
 
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        variants={pageTransition}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+      >
+        <Routes location={location}>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/guide" element={<Guide />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/guide" element={<Guide />} />
-      </Routes>
+      <AnimatedRoutes />
       <Footer />
     </BrowserRouter>
   );

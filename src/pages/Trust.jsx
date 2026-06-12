@@ -1,3 +1,4 @@
+import { ScrollReveal, StaggerParent, AnimatedCounter } from "../motion/MotionPrimitives";
 import './Trust.css';
 
 const trustPoints = [
@@ -14,24 +15,24 @@ export default function Trust() {
     <section className="trust section-padding">
       <div className="container">
         {/* Stats band */}
-        <div className="stats-band animate-on-scroll">
+        <ScrollReveal className="stats-band">
           <div className="stats-inner">
             {[
-              { num: '500+', label: 'عيادة تثق بنا', color: 'teal' },
-              { num: '50K+', label: 'موعد تم تنظيمه', color: 'blue' },
-              { num: '99.9%', label: 'وقت تشغيل', color: 'gold' },
-              { num: '4.9★', label: 'تقييم المستخدمين', color: 'teal' },
-            ].map(({ num, label, color }, i) => (
+              { num: 500, suffix: '+', label: 'عيادة تثق بنا', color: 'teal' },
+              { num: 50, suffix: 'K+', label: 'موعد تم تنظيمه', color: 'blue' },
+              { num: 99.9, suffix: '%', label: 'وقت تشغيل', color: 'gold' },
+              { num: 4.9, suffix: '★', label: 'تقييم المستخدمين', color: 'teal' },
+            ].map(({ num, suffix, label, color }, i) => (
               <div key={i} className={`band-stat band-stat-${color}`}>
-                <div className="band-num">{num}</div>
+                <div className="band-num"><AnimatedCounter target={num} suffix={suffix} decimals={num % 1 === 0 ? 0 : 1} /></div>
                 <div className="band-label">{label}</div>
               </div>
             ))}
           </div>
-        </div>
+        </ScrollReveal>
 
         <div className="trust-content">
-          <div className="trust-text animate-on-scroll">
+          <ScrollReveal className="trust-text">
             <div className="tag">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               لماذا ZIARA؟
@@ -45,9 +46,9 @@ export default function Trust() {
               كتير من العيادات المصرية بتعاني من ضعف الإنترنت، الأنظمة الورقية،
               وأدوات SaaS غير مستقرة. ZIARA جاي يحل كل ده.
             </p>
-            <div className="trust-points">
+            <StaggerParent className="trust-points" stagger={0.05}>
               {trustPoints.map(({ icon, title, desc }, i) => (
-                <div key={i} className={`trust-point animate-on-scroll delay-${i + 1}`}>
+                <div key={i} className={`trust-point`}>
                   <div className="trust-icon">{icon}</div>
                   <div>
                     <div className="trust-point-title">{title}</div>
@@ -55,10 +56,10 @@ export default function Trust() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
+            </StaggerParent>
+          </ScrollReveal>
 
-          <div className="trust-visual animate-on-scroll delay-2">
+          <ScrollReveal className="trust-visual" delay={0.15}>
             <div className="trust-card-stack">
               <div className="trust-main-card">
                 <div className="trust-card-header">
@@ -98,7 +99,7 @@ export default function Trust() {
                 </div>
               </div>
             </div>
-          </div>
+        </ScrollReveal>
         </div>
       </div>
     </section>

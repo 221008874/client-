@@ -1,3 +1,4 @@
+import { ScrollReveal, StaggerParent } from "../motion/MotionPrimitives";
 import './About.css';
 
 export default function About() {
@@ -6,7 +7,7 @@ export default function About() {
       <div className="container">
         <div className="about-grid">
           {/* Left - Visual */}
-          <div className="about-visual animate-on-scroll">
+          <ScrollReveal className="about-visual">
             <div className="arch-diagram">
               {/* Central hub */}
               <div className="arch-center">
@@ -55,10 +56,10 @@ export default function About() {
               <div className="arch-ring arch-ring-1" />
               <div className="arch-ring arch-ring-2" />
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Right - Text */}
-          <div className="about-text animate-on-scroll delay-2">
+          <ScrollReveal className="about-text" delay={0.15}>
             <div className="tag">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"/>
@@ -77,7 +78,7 @@ export default function About() {
               للأطباء والسكرتارية والمرضى.
             </p>
 
-            <div className="about-pillars">
+            <StaggerParent className="about-pillars" stagger={0.06}>
               {[
                 {
                   icon: '🖥️',
@@ -104,7 +105,7 @@ export default function About() {
                   color: 'teal',
                 },
               ].map(({ icon, title, desc, color }, i) => (
-                <div key={i} className={`pillar animate-on-scroll delay-${i + 2}`}>
+                <div key={i} className={`pillar`}>
                   <div className={`pillar-icon pillar-${color}`}>{icon}</div>
                   <div className="pillar-content">
                     <div className="pillar-title">{title}</div>
@@ -112,7 +113,7 @@ export default function About() {
                   </div>
                 </div>
               ))}
-            </div>
+            </StaggerParent>
 
             <a href="#download" className="btn-primary about-cta">
               ابدأ تجربتك المجانية
@@ -120,7 +121,7 @@ export default function About() {
                 <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </a>
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

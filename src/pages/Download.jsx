@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ScrollReveal, StaggerParent } from "../motion/MotionPrimitives";
 import './Download.css';
 
 const APPS = [
@@ -23,7 +24,7 @@ export default function Download() {
     <section className="download section-padding" id="download">
       <div className="container">
         <div className="download-wrapper">
-          <div className="download-content animate-on-scroll">
+          <ScrollReveal className="download-content">
             <div className="tag">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
@@ -39,7 +40,7 @@ export default function Download() {
               اختر المكونات التي تريد تحميلها ثم اضغط التحميل.
             </p>
 
-            <div className="app-checkboxes animate-on-scroll delay-1">
+            <ScrollReveal className="app-checkboxes" delay={0.1}>
               {APPS.map((app) => (
                 <label key={app.key} className={`app-checkbox ${checked[app.key] ? 'checked' : ''}`} onClick={() => toggle(app.key)}>
                   <div className="app-cb-display">
@@ -58,9 +59,9 @@ export default function Download() {
                   </div>
                 </label>
               ))}
-            </div>
+            </ScrollReveal>
 
-            <div className="requirements animate-on-scroll delay-1">
+            <ScrollReveal className="requirements" delay={0.1}>
               <div className="req-title">المتطلبات:</div>
               <ul className="req-list">
                 <li>
@@ -76,9 +77,9 @@ export default function Download() {
                   اتصال إنترنت للمزامنة (اختياري)
                 </li>
               </ul>
-            </div>
+            </ScrollReveal>
 
-            <div className="download-actions animate-on-scroll delay-2">
+            <ScrollReveal className="download-actions" delay={0.2}>
               <button onClick={handleDownload} className="btn-primary dl-btn-main" disabled={selected.length === 0}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -95,16 +96,16 @@ export default function Download() {
                 </svg>
                 دليل الاستخدام
               </a>
-            </div>
+            </ScrollReveal>
 
-            <div className="dl-meta animate-on-scroll delay-3">
+            <ScrollReveal className="dl-meta" delay={0.3}>
               <span>📦 {selected.length} ملف/ملفات محددة</span>
               <span className="dl-sep">·</span>
               <span>🔄 آخر تحديث: مايو 2025</span>
               <span className="dl-sep">·</span>
               <span>✅ آمن ومرخص</span>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* What's included */}
           <div className="dl-includes animate-on-scroll delay-2">

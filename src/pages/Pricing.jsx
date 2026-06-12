@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ScrollReveal } from "../motion/MotionPrimitives";
 import './Pricing.css';
 
 const plans = [
@@ -66,7 +67,7 @@ export default function Pricing() {
   return (
     <section className="pricing section-padding" id="pricing">
       <div className="container">
-        <div className="pricing-header animate-on-scroll" style={{ textAlign: 'center' }}>
+        <ScrollReveal className="pricing-header" style={{ textAlign: 'center' }}>
           <div className="tag">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="12" y1="1" x2="12" y2="23"/>
@@ -96,13 +97,13 @@ export default function Pricing() {
               <span className="save-badge">وفّر 20%</span>
             </span>
           </div>
-        </div>
+        </ScrollReveal>
 
         <div className="pricing-grid">
           {plans.map((plan, i) => (
+            <ScrollReveal key={i} delay={0.1 * (i + 1)}>
             <div
-              key={i}
-              className={`pricing-card animate-on-scroll delay-${i + 1} ${plan.popular ? 'popular' : ''} plan-${plan.color}`}
+              className={`pricing-card ${plan.popular ? 'popular' : ''} plan-${plan.color}`}
             >
               {plan.popular && (
                 <div className="popular-badge">⭐ الأكثر شيوعًا</div>
@@ -146,10 +147,11 @@ export default function Pricing() {
                 {plan.cta}
               </a>
             </div>
+            </ScrollReveal>
           ))}
         </div>
 
-        <div className="pricing-footer animate-on-scroll">
+        <ScrollReveal className="pricing-footer">
           <div className="pricing-note">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
               <circle cx="12" cy="12" r="10"/>
@@ -171,7 +173,7 @@ export default function Pricing() {
             </svg>
             <span>ترقية سهلة في أي وقت</span>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

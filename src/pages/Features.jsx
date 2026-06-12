@@ -1,3 +1,5 @@
+import { ScrollReveal, StaggerParent, MotionCard } from "../motion/MotionPrimitives";
+import { fadeIn } from "../motion/motionSystem";
 import './Features.css';
 
 const features = [
@@ -108,7 +110,7 @@ export default function Features() {
   return (
     <section className="features section-padding" id="features">
       <div className="container">
-        <div className="features-header animate-on-scroll">
+        <ScrollReveal className="features-header">
           <div className="tag">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
@@ -123,13 +125,14 @@ export default function Features() {
           <p className="section-subtitle">
             من الحجز للتقارير… كل حاجة مترتبة. نظام متكامل صُمّم خصيصًا للعيادات المصرية.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div className="features-grid">
+        <StaggerParent className="features-grid" stagger={0.06}>
           {features.map((feat, i) => (
-            <div
+            <MotionCard
               key={i}
-              className={`feature-card animate-on-scroll delay-${(i % 4) + 1}`}
+              className={`feature-card`}
+              hoverLift={6}
             >
               <div className={`feat-icon-wrap feat-icon-${feat.color}`}>
                 {feat.icon}
@@ -142,9 +145,9 @@ export default function Features() {
                 <p className="feat-desc">{feat.desc}</p>
               </div>
 
-            </div>
+            </MotionCard>
           ))}
-        </div>
+        </StaggerParent>
       </div>
     </section>
   );

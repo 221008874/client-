@@ -1,10 +1,11 @@
+import { ScrollReveal } from "../motion/MotionPrimitives";
 import './VideoSection.css';
 
 export default function VideoSection() {
   return (
     <section className="video-section section-padding" id="video">
       <div className="container">
-        <div className="video-header animate-on-scroll">
+        <ScrollReveal className="video-header">
           <div className="tag">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polygon points="23 7 16 12 23 17 23 7" />
@@ -17,9 +18,9 @@ export default function VideoSection() {
             <br />
             <span className="gradient-text">في دقيقة واحدة</span>
           </h2>
-        </div>
+        </ScrollReveal>
 
-        <div className="video-wrapper animate-on-scroll delay-1">
+        <ScrollReveal className="video-wrapper" delay={0.1}>
           <div className="video-frame">
             <video
               className="video-player"
@@ -40,7 +41,7 @@ export default function VideoSection() {
             </svg>
             <span>شاهد كيف يعمل Ziara Smart Clinic — من إدارة المرضى إلى جدولة المواعيد والتقارير</span>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );
