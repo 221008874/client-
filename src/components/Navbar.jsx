@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { navbarScroll } from '../motion/motionSystem';
 import './Navbar.css';
 import logoSrc from '../assets/logo.png';
 
@@ -20,7 +22,12 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+    <motion.nav
+      className="navbar"
+      variants={navbarScroll}
+      initial="transparent"
+      animate={scrolled ? 'solid' : 'transparent'}
+    >
       <div className="nav-container">
         <a href="/" className="nav-logo">
           <div className="logo-icon">
@@ -50,6 +57,6 @@ export default function Navbar() {
           </button>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 }

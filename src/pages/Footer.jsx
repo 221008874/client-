@@ -1,3 +1,4 @@
+import { ScrollReveal } from "../motion/MotionPrimitives";
 import './Footer.css';
 
 export default function Footer() {
@@ -12,7 +13,7 @@ export default function Footer() {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="container">
-          <div className="cta-box animate-on-scroll">
+          <ScrollReveal className="cta-box">
             <div className="tag cta-tag">
               <span style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--accent)', borderRadius: '50%', marginLeft: 8 }} />
               ابدأ اليوم
@@ -46,7 +47,7 @@ export default function Footer() {
               <span>✓ تثبيت في دقيقتين</span>
               <span>✓ دعم فوري</span>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 

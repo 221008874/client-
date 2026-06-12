@@ -113,7 +113,7 @@ export default function Download() {
               <span className="dl-check-icon">✓</span>
               ما يشمله البرنامج
             </div>
-            <div className="dl-items">
+            <StaggerParent className="dl-items" stagger={0.05}>
               {[
                 { icon: '🏥', title: 'برنامج إدارة العيادة', desc: 'كامل الميزات' },
                 { icon: '📅', title: 'نظام الحجز والمواعيد', desc: 'ذكي وسريع' },
@@ -122,7 +122,7 @@ export default function Download() {
                 { icon: '💾', title: 'النسخ الاحتياطي', desc: 'تلقائي يومياً' },
                 { icon: '🌐', title: 'ربط منصة زيارة', desc: 'حجز أونلاين' },
               ].map(({ icon, title, desc }, i) => (
-                <div key={i} className={`dl-item animate-on-scroll delay-${i + 1}`}>
+                <div key={i} className="dl-item">
                   <div className="dl-item-icon">{icon}</div>
                   <div>
                     <div className="dl-item-title">{title}</div>
@@ -131,7 +131,7 @@ export default function Download() {
                   <div className="dl-item-check">✓</div>
                 </div>
               ))}
-            </div>
+            </StaggerParent>
 
             <div className="support-links">
               <a href="#" className="support-link">
@@ -143,7 +143,7 @@ export default function Download() {
                 الأسئلة الشائعة
               </a>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>
