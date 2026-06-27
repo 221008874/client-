@@ -1,0 +1,427 @@
+/* ═══════════════════════════════════════════
+   ABOUT SECTION — Enterprise Architecture
+   ═══════════════════════════════════════════ */
+.about {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle background mesh */
+.about::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 50%;
+  height: 140%;
+  background: radial-gradient(ellipse, rgba(6, 182, 212, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.about::after {
+  content: '';
+  position: absolute;
+  bottom: -10%;
+  right: -5%;
+  width: 40%;
+  height: 120%;
+  background: radial-gradient(ellipse, rgba(56, 189, 248, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ─── Grid ─── */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-24);
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Visual / Architecture Diagram ─── */
+.about-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arch-diagram {
+  position: relative;
+  width: 340px;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Center hub */
+.arch-center {
+  position: absolute;
+  width: 92px;
+  height: 92px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  z-index: 3;
+  box-shadow:
+    0 8px 32px rgba(6, 182, 212, 0.3),
+    0 0 0 1px rgba(6, 182, 212, 0.15) inset;
+}
+
+.arch-center::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Pulse ring behind center */
+.arch-center::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 24px;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  animation: pulse-ring 3s ease-out infinite;
+}
+
+.arch-center-label {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--text-white);
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+}
+
+/* SVG connection lines */
+.arch-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.arch-lines line,
+.arch-lines path {
+  stroke: rgba(6, 182, 212, 0.12);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+/* Orbit rings */
+.arch-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px dashed rgba(6, 182, 212, 0.06);
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.arch-ring-1 {
+  width: 200px;
+  height: 200px;
+  border-color: rgba(6, 182, 212, 0.07);
+  animation: rotate-slow 60s linear infinite;
+}
+
+.arch-ring-2 {
+  width: 280px;
+  height: 280px;
+  border-color: rgba(56, 189, 248, 0.04);
+  animation: rotate-slow 90s linear infinite reverse;
+}
+
+/* Satellite nodes */
+.arch-node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 1.4rem;
+  transition: all var(--transition-base);
+  cursor: default;
+  min-width: 68px;
+  box-shadow: var(--shadow-sm);
+}
+
+.arch-node:hover {
+  border-color: rgba(6, 182, 212, 0.3);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow:
+    var(--shadow-elevated),
+    0 0 20px rgba(6, 182, 212, 0.08);
+}
+
+.arch-node-label {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Node positions */
+.arch-node-1 { top: 8px; right: 16px; }
+.arch-node-2 { top: 8px; left: 16px; }
+.arch-node-3 { top: 50%; right: -14px; transform: translateY(-50%); }
+.arch-node-3:hover { transform: translateY(-50%) scale(1.08) translateY(-2px); }
+.arch-node-4 { bottom: 8px; left: 16px; }
+.arch-node-5 { bottom: 8px; right: 16px; }
+
+/* ─── Text Content ─── */
+.about-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-desc {
+  font-size: 1.02rem;
+  color: var(--text-secondary);
+  line-height: 1.9;
+  margin-bottom: var(--space-10);
+}
+
+/* ─── Pillars (Feature list) ─── */
+.about-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-10);
+}
+
+.pillar {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+/* Hover glow background */
+.pillar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
+}
+
+.pillar:hover {
+  border-color: rgba(6, 182, 212, 0.2);
+  transform: translateX(-4px);
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(6, 182, 212, 0.06);
+}
+
+.pillar:hover::before {
+  opacity: 1;
+}
+
+/* Left accent line on hover */
+.pillar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 0;
+  background: linear-gradient(180deg, var(--accent), var(--accent-secondary));
+  border-radius: 0 3px 3px 0;
+  transition: height var(--transition-base);
+}
+
+.pillar:hover::after {
+  height: 100%;
+}
+
+/* Icon containers */
+.pillar-icon {
+  font-size: 1.3rem;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform var(--transition-base);
+}
+
+.pillar:hover .pillar-icon {
+  transform: scale(1.08);
+}
+
+.pillar-teal {
+  background: var(--accent-glow);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.pillar-teal::before {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.03), transparent);
+}
+
+.pillar-blue {
+  background: var(--accent-secondary-glow);
+  border: 1px solid rgba(56, 189, 248, 0.1);
+}
+
+.pillar-blue::before {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.03), transparent);
+}
+
+.pillar-gold {
+  background: var(--warning-glow);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.pillar-gold::before {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.03), transparent);
+}
+
+/* Pillar text */
+.pillar-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pillar-title {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.pillar-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+/* CTA */
+.about-cta {
+  width: fit-content;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .about-grid {
+    gap: var(--space-16);
+  }
+
+  .arch-diagram {
+    width: 300px;
+    height: 300px;
+  }
+
+  .arch-center {
+    width: 80px;
+    height: 80px;
+  }
+
+  .arch-ring-1 { width: 170px; height: 170px; }
+  .arch-ring-2 { width: 240px; height: 240px; }
+}
+
+@media (max-width: 900px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-16);
+  }
+
+  .about-visual {
+    order: -1;
+  }
+
+  .about-text {
+    align-items: center;
+    text-align: center;
+  }
+
+  .about-desc {
+    max-width: 520px;
+  }
+
+  .about-pillars {
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .pillar {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .pillar:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Flip the accent line to left on mobile centered layout */
+  .pillar::after {
+    right: auto;
+    left: 0;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .about-cta {
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .arch-diagram {
+    width: 260px;
+    height: 260px;
+  }
+
+  .arch-center {
+    width: 70px;
+    height: 70px;
+  }
+
+  .arch-ring-1 { width: 150px; height: 150px; }
+  .arch-ring-2 { width: 210px; height: 210px; }
+
+  .arch-node {
+    padding: 8px 10px;
+    font-size: 1.1rem;
+    min-width: 56px;
+  }
+
+  .arch-node-label {
+    font-size: 0.52rem;
+  }
+
+  .pillar-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+}

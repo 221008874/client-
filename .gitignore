@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Vite build output
+dist/
+
+# Environment variables (NEVER commit real .env files)
+.env*
+!.env.example
+
+# Vercel deployment
+.vercel/
+
+# Build/cache files
+*.tsbuildinfo
+.cache/
+.DS_Store
+*.log
+coverage/
+
+# Firebase secrets (CRITICAL - never commit)
+firebase-service-account.json
+service-account.json
+*.p12
+*.pem

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>جاري التحميل - ZIARA</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', 'Segoe UI', sans-serif;
+      background: #060d18;
+      color: #e8f0fe;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      text-align: center;
+      direction: rtl;
+      padding: 24px;
+    }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid rgba(0,212,170,0.15);
+      border-top-color: #00d4aa;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 24px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
+    p { color: #8ba3c7; font-size: 0.95rem; line-height: 1.7; }
+    .files { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .file { color: #4a6080; font-size: 0.88rem; }
+    .file.done { color: #00d4aa; }
+    .back { margin-top: 40px; }
+    .back a { color: #8ba3c7; font-size: 0.9rem; text-decoration: none; border: 1px solid rgba(0,212,170,0.2); padding: 10px 24px; border-radius: 50px; transition: all 0.3s; display: inline-block; }
+    .back a:hover { border-color: #00d4aa; color: #00d4aa; }
+  </style>
+</head>
+<body>
+  <div class="spinner"></div>
+  <h2>جاري التحميل…</h2>
+  <p>سيبدأ تحميل الملفات المحددة تلقائياً</p>
+  <div class="files" id="status"></div>
+  <div class="back"><a href="/">← العودة للصفحة الرئيسية</a></div>
+
+  <script>
+    const ALL = [
+      { key: 'dr',     label: 'Ziara.DR.zip',     url: 'https://github.com/221008874/client-/releases/download/Ziara_ready/Ziara.DR.v1.6.4.zip' },
+      { key: 'sec',    label: 'Ziara.SEC.zip',     url: 'https://github.com/221008874/client-/releases/download/Ziara_ready/Ziara.SEC.v1.6.4.zip' },
+      { key: 'server', label: 'Ziara.Server.zip',  url: 'https://github.com/221008874/client-/releases/download/Ziara_ready/Ziara.Server.v1.6.4.zip' },
+    ];
+
+    const params = new URLSearchParams(location.search);
+    const selected = (params.get('files') || 'dr,sec,server').split(',');
+    const files = ALL.filter(f => selected.includes(f.key));
+
+    const status = document.getElementById('status');
+    files.forEach((f, i) => {
+      const el = document.createElement('div');
+      el.className = 'file';
+      el.id = 's' + i;
+      el.textContent = '⏳ ' + f.label;
+      status.appendChild(el);
+
+      setTimeout(() => {
+        const a = document.createElement('a');
+        a.href = f.url;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        el.className = 'file done';
+        el.textContent = '✓ ' + f.label;
+      }, i * 2500);
+    });
+
+    if (files.length === 0) {
+      status.innerHTML = '<div class="file" style="color:var(--accent-gold)">⚠️ لم يتم اختيار أي ملف</div>';
+    }
+  </script>
+</body>
+</html>
