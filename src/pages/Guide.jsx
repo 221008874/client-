@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ScrollReveal, accordionContent } from "../motion/MotionPrimitives";
+import { ScrollReveal } from "../motion/MotionPrimitives";
 import './Guide.css';
 
 /* ─── Data ─────────────────────────────────── */
