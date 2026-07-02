@@ -7,9 +7,9 @@ import './Guide.css';
 const SECTIONS = [
   { id: 'overview',  label: 'نظرة عامة' },
   { id: 'start',     label: 'كيف تبدأ' },
-  { id: 'server',    label: 'Ziara Server' },
-  { id: 'dr',        label: 'Ziara DR (الطبيب)' },
-  { id: 'sec',       label: 'Ziara SEC (السكرتيرة)' },
+  { id: 'server',    label: 'Zeyara Server' },
+  { id: 'dr',        label: 'Zeyara DR (الطبيب)' },
+  { id: 'sec',       label: 'Zeyara SEC (السكرتيرة)' },
   { id: 'community', label: 'الحجز الأونلاين' },
   { id: 'faq',       label: 'الأسئلة الشائعة' },
 ];
@@ -23,12 +23,12 @@ const FAQ_ITEMS = [
   {
     icon: '🌐',
     q: 'هل يعمل البرنامج بدون إنترنت؟',
-    a: 'نعم! يعمل البرنامج بشكل كامل دون إنترنت. الإنترنت مطلوب فقط لمزامنة الحجوزات الأونلاين مع موقع Ziara Community.',
+    a: 'نعم! يعمل البرنامج بشكل كامل دون إنترنت. الإنترنت مطلوب فقط لمزامنة الحجوزات الأونلاين مع موقع Zeyara Community.',
   },
   {
     icon: '💻',
     q: 'كم جهازاً يمكن ربطه بالسيرفر؟',
-    a: 'يمكن ربط عدة أجهزة في نفس الشبكة. مثلاً: جهاز الطبيب + جهاز السكرتيرة في العيادة، وكلاهما يتصل بـ Ziara Server.',
+    a: 'يمكن ربط عدة أجهزة في نفس الشبكة. مثلاً: جهاز الطبيب + جهاز السكرتيرة في العيادة، وكلاهما يتصل بـ Zeyara Server.',
   },
   {
     icon: '🔒',
@@ -48,7 +48,7 @@ const FAQ_ITEMS = [
   {
     icon: '🔧',
     q: 'ماذا أفعل إذا لم يتصل التطبيق بالسيرفر؟',
-    a: 'تأكد أولاً أن Ziara Server يعمل وتظهر نافذته. ثم تحقق من IP والبورت في إعدادات التطبيق، وتأكد أن كلا الجهازين على نفس شبكة الواي فاي.',
+    a: 'تأكد أولاً أن Zeyara Server يعمل وتظهر نافذته. ثم تحقق من IP والبورت في إعدادات التطبيق، وتأكد أن كلا الجهازين على نفس شبكة الواي فاي.',
   },
 ];
 
@@ -158,7 +158,7 @@ export default function Guide() {
           >
             كيف تستخدم
             <br />
-            <span>ZIARA Smart Clinic</span>
+            <span>Zeyara Clinic</span>
           </motion.h1>
 
           <motion.p
@@ -239,16 +239,16 @@ export default function Guide() {
 
               <ScrollReveal delay={0.1}>
                 <p style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: 28 }}>
-                  برنامج Ziara هو نظام متكامل لإدارة العيادات الطبية. يتكون من أربعة أجزاء تعمل معاً لتوفير تجربة إدارة سلسة للطبيب والسكرتيرة والمرضى.
+                  برنامج Zeyara هو نظام متكامل لإدارة العيادات الطبية. يتكون من أربعة أجزاء تعمل معاً لتوفير تجربة إدارة سلسة للطبيب والسكرتيرة والمرضى.
                 </p>
               </ScrollReveal>
 
               <ScrollReveal className="start-order" delay={0.15}>
                 {[
-                  { icon: '🖥️', name: 'Ziara Server', desc: 'قلب النظام — يُشغَّل أولاً ويربط كل الأجزاء ببعض', badge: 'إلزامي', cls: 'order-first' },
-                  { icon: '🩺', name: 'Ziara DR', desc: 'تطبيق الطبيب — إدارة المرضى والمواعيد والتقارير الطبية', badge: '', cls: '' },
-                  { icon: '📋', name: 'Ziara SEC', desc: 'تطبيق السكرتيرة — استقبال المرضى وإدارة طابور الانتظار', badge: '', cls: '' },
-                  { icon: '🌐', name: 'Ziara Community', desc: 'موقع الحجز الإلكتروني للمرضى — اختياري', badge: '', cls: '' },
+                  { icon: '🖥️', name: 'Zeyara Server', desc: 'قلب النظام — يُشغَّل أولاً ويربط كل الأجزاء ببعض', badge: 'إلزامي', cls: 'order-first' },
+                  { icon: '🩺', name: 'Zeyara DR', desc: 'تطبيق الطبيب — إدارة المرضى والمواعيد والتقارير الطبية', badge: '', cls: '' },
+                  { icon: '📋', name: 'Zeyara SEC', desc: 'تطبيق السكرتيرة — استقبال المرضى وإدارة طابور الانتظار', badge: '', cls: '' },
+                  { icon: '🌐', name: 'Zeyara Community', desc: 'موقع الحجز الإلكتروني للمرضى — اختياري', badge: '', cls: '' },
                 ].map((item, i, arr) => (
                   <div key={i}>
                     <motion.div
@@ -287,26 +287,26 @@ export default function Guide() {
                   <div className="app-card-body">
                     <div className="steps-list">
                       <StepRow num="1" title="حمّل الملفات الثلاثة">
-                        <p>من صفحة التحميل، اضغط "تحميل البرنامج" للحصول على الملفات الثلاثة: <strong style={{ color: 'var(--text)' }}>Ziara Server</strong> و<strong style={{ color: 'var(--text)' }}>Ziara DR</strong> و<strong style={{ color: 'var(--text)' }}>Ziara SEC</strong>.</p>
+                        <p>من صفحة التحميل، اضغط "تحميل البرنامج" للحصول على الملفات الثلاثة: <strong style={{ color: 'var(--text)' }}>Zeyara Server</strong> و<strong style={{ color: 'var(--text)' }}>Zeyara DR</strong> و<strong style={{ color: 'var(--text)' }}>Zeyara SEC</strong>.</p>
                       </StepRow>
                       <StepRow num="2" title="فك ضغط الملفات">
-                        <p>انقر بزر الماوس الأيمن على كل ملف ZIP ← اختر "استخراج هنا" أو "Extract Here". يُفضَّل استخراجها في مجلد مثل <code style={{ background: 'rgba(6,182,212,0.08)', color: 'var(--accent)', padding: '2px 8px', borderRadius: 6, fontSize: '0.8rem', fontWeight: 600 }}>C:\Ziara</code>.</p>
+                        <p>انقر بزر الماوس الأيمن على كل ملف ZIP ← اختر "استخراج هنا" أو "Extract Here". يُفضَّل استخراجها في مجلد مثل <code style={{ background: 'rgba(6,182,212,0.08)', color: 'var(--accent)', padding: '2px 8px', borderRadius: 6, fontSize: '0.8rem', fontWeight: 600 }}>C:\Zeyara</code>.</p>
                       </StepRow>
                       <StepRow num="3" title="شغّل السيرفر أولاً">
-                        <p>ادخل على مجلد Ziara Server وانقر مرتين على <strong style={{ color: 'var(--text)' }}>Ziara Server.exe</strong>. سيفتح نافذة تحكم. اضغط <strong style={{ color: 'var(--accent)' }}>Start Server</strong>.</p>
+                        <p>ادخل على مجلد Zeyara Server وانقر مرتين على <strong style={{ color: 'var(--text)' }}>Zeyara Server.exe</strong>. سيفتح نافذة تحكم. اضغط <strong style={{ color: 'var(--accent)' }}>Start Server</strong>.</p>
                         <div className="step-tip">
                           <span className="tip-icon">💡</span>
                           <p>لاحظ الـ <strong>IP</strong> والـ <strong>Port</strong> المكتوبين في نافذة السيرفر — ستحتاجهم في الخطوة التالية.</p>
                         </div>
                       </StepRow>
                       <StepRow num="4" title="شغّل تطبيق الطبيب">
-                        <p>انقر مرتين على <strong style={{ color: 'var(--text)' }}>Ziara DR.exe</strong>. في أول مرة ستُطلب منك تسجيل حساب الطبيب المسؤول.</p>
+                        <p>انقر مرتين على <strong style={{ color: 'var(--text)' }}>Zeyara DR.exe</strong>. في أول مرة ستُطلب منك تسجيل حساب الطبيب المسؤول.</p>
                       </StepRow>
                       <StepRow num="5" title="اضبط الاتصال بالسيرفر">
                         <p>من داخل تطبيق الطبيب، اذهب إلى <strong style={{ color: 'var(--text)' }}>الإعدادات ← اتصال السيرفر</strong> وأدخل الـ IP والـ Port من الخطوة السابقة.</p>
                       </StepRow>
                       <StepRow num="6" title="شغّل تطبيق السكرتيرة" isLast>
-                        <p>انقر مرتين على <strong style={{ color: 'var(--text)' }}>Ziara SEC.exe</strong> وكرر نفس خطوة ضبط الاتصال بالسيرفر.</p>
+                        <p>انقر مرتين على <strong style={{ color: 'var(--text)' }}>Zeyara SEC.exe</strong> وكرر نفس خطوة ضبط الاتصال بالسيرفر.</p>
                         <div className="step-tip">
                           <span className="tip-icon">✅</span>
                           <p><strong>مبروك!</strong> النظام جاهز للاستخدام. يمكنك الآن إضافة مرضى وجدولة مواعيد.</p>
@@ -324,7 +324,7 @@ export default function Guide() {
                 <div className="section-header">
                   <div className="section-num">3</div>
                   <div className="section-title-wrap">
-                    <h2>Ziara Server</h2>
+                    <h2>Zeyara Server</h2>
                     <p>السيرفر المركزي — يجب تشغيله دائماً أولاً</p>
                   </div>
                 </div>
@@ -335,7 +335,7 @@ export default function Guide() {
                   <div className="app-card-header">
                     <div className="app-icon-wrap icon-server">🖥️</div>
                     <div className="app-card-meta">
-                      <h3>Ziara Server</h3>
+                      <h3>Zeyara Server</h3>
                       <p>يحتوي على قاعدة البيانات والـ API الذي تتصل به كل التطبيقات</p>
                     </div>
                     <span className="app-badge badge-required">يُشغَّل أولاً دائماً</span>
@@ -343,7 +343,7 @@ export default function Guide() {
                   <div className="app-card-body">
                     <div className="steps-list">
                       <StepRow num="1" title="فتح البرنامج">
-                        <p>انقر مرتين على <strong style={{ color: 'var(--text)' }}>Ziara Server.exe</strong> — ستفتح نافذة لوحة التحكم.</p>
+                        <p>انقر مرتين على <strong style={{ color: 'var(--text)' }}>Zeyara Server.exe</strong> — ستفتح نافذة لوحة التحكم.</p>
                       </StepRow>
                       <StepRow num="2" title="تشغيل السيرفر">
                         <p>اضغط على زر <strong style={{ color: 'var(--accent)' }}>Start Server</strong> داخل النافذة. انتظر بضع ثوانٍ حتى يظهر أنه يعمل.</p>
@@ -367,7 +367,7 @@ export default function Guide() {
                 <div className="section-header">
                   <div className="section-num">4</div>
                   <div className="section-title-wrap">
-                    <h2>Ziara DR — تطبيق الطبيب</h2>
+                    <h2>Zeyara DR — تطبيق الطبيب</h2>
                     <p>إدارة شاملة للعيادة من شاشة واحدة</p>
                   </div>
                 </div>
@@ -378,7 +378,7 @@ export default function Guide() {
                   <div className="app-card-header">
                     <div className="app-icon-wrap icon-dr">🩺</div>
                     <div className="app-card-meta">
-                      <h3>Ziara DR</h3>
+                      <h3>Zeyara DR</h3>
                       <p>للطبيب — المرضى، المواعيد، الوصفات، التشخيص، التقارير المالية</p>
                     </div>
                     <span className="app-badge badge-optional">للطبيب</span>
@@ -424,7 +424,7 @@ export default function Guide() {
                 <div className="section-header">
                   <div className="section-num">5</div>
                   <div className="section-title-wrap">
-                    <h2>Ziara SEC — تطبيق السكرتيرة</h2>
+                    <h2>Zeyara SEC — تطبيق السكرتيرة</h2>
                     <p>استقبال المرضى وإدارة طابور الانتظار</p>
                   </div>
                 </div>
@@ -435,7 +435,7 @@ export default function Guide() {
                   <div className="app-card-header">
                     <div className="app-icon-wrap icon-sec">📋</div>
                     <div className="app-card-meta">
-                      <h3>Ziara SEC</h3>
+                      <h3>Zeyara SEC</h3>
                       <p>للسكرتيرة — استقبال، مواعيد، بحث عن المرضى</p>
                     </div>
                     <span className="app-badge badge-optional">للسكرتيرة</span>
@@ -443,10 +443,10 @@ export default function Guide() {
                   <div className="app-card-body">
                     <div className="steps-list">
                       <StepRow num="1" title="تشغيل التطبيق">
-                        <p>انقر مرتين على <strong style={{ color: 'var(--text)' }}>Ziara SEC.exe</strong>.</p>
+                        <p>انقر مرتين على <strong style={{ color: 'var(--text)' }}>Zeyara SEC.exe</strong>.</p>
                       </StepRow>
                       <StepRow num="2" title="ربطه بالسيرفر">
-                        <p>أدخل نفس IP وPort الخاصين بـ Ziara Server في إعدادات التطبيق.</p>
+                        <p>أدخل نفس IP وPort الخاصين بـ Zeyara Server في إعدادات التطبيق.</p>
                       </StepRow>
                       <StepRow num="3" title="الميزات المتاحة" isLast>
                         <p>من التطبيق يمكن للسكرتيرة:</p>
@@ -474,7 +474,7 @@ export default function Guide() {
                   <div className="section-num">6</div>
                   <div className="section-title-wrap">
                     <h2>الحجز الأونلاين</h2>
-                    <p>كيف يحجز المرضى عبر موقع Ziara Community</p>
+                    <p>كيف يحجز المرضى عبر موقع Zeyara Community</p>
                   </div>
                 </div>
               </ScrollReveal>
@@ -484,7 +484,7 @@ export default function Guide() {
                   <div className="app-card-header">
                     <div className="app-icon-wrap icon-web">🌐</div>
                     <div className="app-card-meta">
-                      <h3>Ziara Community</h3>
+                      <h3>Zeyara Community</h3>
                       <p>موقع إلكتروني للمرضى لحجز المواعيد أونلاين</p>
                     </div>
                     <span className="app-badge badge-optional">اختياري</span>
@@ -501,13 +501,13 @@ export default function Guide() {
                         <p>تُخزَّن طلبات الحجز فورياً في Firebase (سحابة آمنة).</p>
                       </StepRow>
                       <StepRow num="3" title="السيرفر يزامن تلقائياً">
-                        <p>Ziara Server يستقبل الحجوزات الجديدة تلقائياً كل فترة وجيزة.</p>
+                        <p>Zeyara Server يستقبل الحجوزات الجديدة تلقائياً كل فترة وجيزة.</p>
                       </StepRow>
                       <StepRow num="4" title="يظهر الحجز في التطبيق" isLast>
                         <p>يرى الطبيب والسكرتيرة الحجز الجديد مباشرةً داخل التطبيق.</p>
                         <div className="step-tip">
                           <span className="tip-icon">📌</span>
-                          <p>هذا الجزء مخصص للمطورين لإعداد الموقع. إذا كنت طبيباً وتريد تفعيله، تواصل مع فريق Ziara.</p>
+                          <p>هذا الجزء مخصص للمطورين لإعداد الموقع. إذا كنت طبيباً وتريد تفعيله، تواصل مع فريق Zeyara.</p>
                         </div>
                       </StepRow>
                     </div>

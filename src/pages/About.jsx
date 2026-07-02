@@ -51,7 +51,7 @@ export default function About() {
                     <path d="M2 12l10 5 10-5" stroke="#060d18" strokeWidth="2.5" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <div className="arch-center-label">ZIARA</div>
+                <div className="arch-center-label">Zeyara</div>
               </motion.div>
 
               {/* Connection lines */}

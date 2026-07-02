@@ -1,0 +1,157 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ────────────────────────────────────────────────
+    function isAnyAdmin() {
+      return request.auth != null &&
+        request.auth.token.admin == true;
+    }
+
+    function isTenantStaff(tenantId) {
+      return request.auth != null &&
+        tenantId != null &&
+        request.auth.uid in get(/databases/$(database)/documents/saas_tenants/$(tenantId)).data.staffUids;
+    }
+
+    function isAnonymous() {
+      return request.auth != null &&
+        request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    function isValidPhone(phone) {
+      return phone.matches('^01[0125][0-9]{8}$');
+    }
+
+    // ─── comm_doctors ────────────────────────────────────────────────────
+    match /comm_doctors/{doctorId} {
+      allow read: if true;
+      allow create: if isAnyAdmin() || isTenantStaff(request.resource.data.tenantId);
+      allow update: if isAnyAdmin() || isTenantStaff(resource.data.tenantId);
+      allow delete: if isAnyAdmin();
+    }
+
+    // ─── comm_tenants ────────────────────────────────────────────────────
+    match /comm_tenants/{tenantId} {
+      allow read: if true;
+      allow create: if isAnyAdmin();
+      allow update: if isAnyAdmin() || isTenantStaff(tenantId);
+      allow delete: if isAnyAdmin();
+    }
+
+    // ─── comm_patients ───────────────────────────────────────────────────
+    match /comm_patients/{phone} {
+      allow read: if request.auth != null && (
+        isAnonymous() ||
+        request.auth.token.phone_number == phone ||
+        isTenantStaff(resource.data.tenantId) ||
+        isAnyAdmin()
+      );
+      allow create: if (request.resource.data.phone == phone && isValidPhone(phone)) || isAnyAdmin() || isAnonymous();
+      allow update: if isAnonymous() ||
+        request.auth.token.phone_number == phone ||
+        isTenantStaff(resource.data.tenantId) ||
+        isAnyAdmin();
+      allow delete: if isAnyAdmin();
+    }
+
+    // ─── comm_appointments ───────────────────────────────────────────────
+    match /comm_appointments/{appointmentId} {
+      allow read: if request.auth != null && (
+        isAnonymous() ||
+        resource.data.patientPhone == request.auth.token.phone_number ||
+        isTenantStaff(resource.data.tenantId) ||
+        isAnyAdmin()
+      );
+      allow create: if request.auth != null &&
+        isValidPhone(request.resource.data.patientPhone);
+      allow update: if isAnonymous() ||
+        request.auth.token.phone_number == resource.data.patientPhone ||
+        isTenantStaff(resource.data.tenantId) ||
+        isAnyAdmin();
+      allow delete: if isAnyAdmin();
+    }
+
+    // ─── comm_doctor_users ───────────────────────────────────────────────
+    match /comm_doctor_users/{email} {
+      allow read: if request.auth != null &&
+        request.auth.token.email == email;
+      allow create, update: if isAnyAdmin();
+      allow delete: if false;
+    }
+
+    // ─── patient_support_requests ────────────────────────────────────────
+    match /patient_support_requests/{requestId} {
+      allow read: if isAnyAdmin() ||
+        (request.auth != null && isTenantStaff(resource.data.tenantId));
+      allow create: if request.auth != null;
+      allow update: if isAnyAdmin();
+      allow delete: if isAnyAdmin();
+    }
+
+    // ─── saas_* collections (admin-only) ─────────────────────────────────
+    match /saas_tenants/{tenantId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /saas_doctors/{doctorId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /saas_licenses/{licenseId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /saas_settings/{settingId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    // ─── NEW: License System Collections ────────────────────────────────
+    match /licenses/{licenseId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /server_license/{docId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /server_instances/{macAddress} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /invalid_reports/{reportId} {
+      allow read: if isAnyAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if isAnyAdmin();
+    }
+
+    match /license_logs/{logId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /servers/{serverId} {
+      allow read: if isAnyAdmin();
+      allow create, update, delete: if isAnyAdmin();
+    }
+
+    match /sync_queue/{queueId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /saas_audit_events/{eventId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    // ─── Deny everything else by default ─────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

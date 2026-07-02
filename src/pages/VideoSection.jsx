@@ -17,7 +17,7 @@ export default function VideoSection() {
             شاهد البرنامج
           </div>
           <h2 className="section-title">
-            Ziara Smart Clinic
+            Zeyara Clinic
             <br />
             <span className="gradient-text">في دقيقة واحدة</span>
           </h2>
@@ -44,7 +44,7 @@ export default function VideoSection() {
               <circle cx="12" cy="12" r="10" />
               <polygon points="10 8 16 12 10 16 10 8" />
             </svg>
-            <span>شاهد كيف يعمل Ziara Smart Clinic — من إدارة المرضى إلى جدولة المواعيد والتقارير</span>
+            <span>شاهد كيف يعمل Zeyara Clinic — من إدارة المرضى إلى جدولة المواعيد والتقارير</span>
           </div>
         </ScrollReveal>
       </div>

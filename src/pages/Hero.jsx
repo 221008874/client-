@@ -16,13 +16,13 @@ const appointments = [
 ];
 
 const avatarStyles = {
-  teal: { background: 'rgba(6, 182, 212, 0.2)', color: '#06b6d4' },
+  teal: { background: 'rgba(0, 184, 212, 0.2)', color: '#00b8d4' },
   blue: { background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8' },
   muted: { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' },
 };
 
 const badgeStyles = {
-  teal: { background: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4' },
+  teal: { background: 'rgba(0, 184, 212, 0.12)', color: '#00b8d4' },
   blue: { background: 'rgba(56, 189, 248, 0.12)', color: '#38bdf8' },
   muted: { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)' },
 };
@@ -48,7 +48,7 @@ export default function Hero() {
 
   return (
     <section className="hero" id="hero">
-      <GlowOrb size={800} color="rgba(6, 182, 212, 0.05)" position="topRight" />
+      <GlowOrb size={800} color="rgba(0, 184, 212, 0.05)" position="topRight" />
       <GlowOrb size={500} color="rgba(56, 189, 248, 0.03)" position="bottomLeft" />
 
       <div className="container hero-container">
@@ -175,7 +175,7 @@ export default function Hero() {
                 <div className="screen-dots">
                   <span /><span /><span />
                 </div>
-                <div className="screen-title">ZIARA Smart Clinic</div>
+                <div className="screen-title">Zeyara Clinic</div>
                 <div className="screen-status">
                   <span className="status-dot" />
                   متصل

@@ -88,7 +88,7 @@ export default function Footer() {
                     <path d="M2 12l10 5 10-5" stroke="#060d18" strokeWidth="2" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <span className="footer-logo-text">ZIARA</span>
+                <span className="footer-logo-text">Zeyara</span>
               </div>
               <p className="footer-brand-desc">
                 نظام متكامل لإدارة العيادات والحجوزات الطبية. مصمم للسوق المصري.
@@ -142,7 +142,7 @@ export default function Footer() {
           <div className="footer-bottom">
             <div className="footer-bottom-line" />
             <div className="footer-bottom-content">
-              <p className="footer-copy">© 2025 ZIARA Smart Clinic. جميع الحقوق محفوظة.</p>
+              <p className="footer-copy">© 2025 Zeyara Clinic. جميع الحقوق محفوظة.</p>
               <div className="footer-badges">
                 <div className="footer-badge">
                   <span className="badge-dot" />

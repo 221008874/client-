@@ -4,9 +4,9 @@ import { ScrollReveal, StaggerParent, GlowOrb, MagneticHover } from "../motion/M
 import './Download.css';
 
 const APPS = [
-  { key: 'dr', icon: '🩺', label: 'Ziara DR', desc: 'تطبيق الطبيب — إدارة المرضى والمواعيد والتقارير' },
-  { key: 'sec', icon: '📋', label: 'Ziara SEC', desc: 'تطبيق السكرتيرة — استقبال وإدارة طابور الانتظار' },
-  { key: 'server', icon: '🖥️', label: 'Ziara Server', desc: 'السيرفر المركزي — يجب تشغيله أولاً' },
+  { key: 'dr', icon: '🩺', label: 'Zeyara DR', desc: 'تطبيق الطبيب — إدارة المرضى والمواعيد والتقارير' },
+  { key: 'sec', icon: '📋', label: 'Zeyara SEC', desc: 'تطبيق السكرتيرة — استقبال وإدارة طابور الانتظار' },
+  { key: 'server', icon: '🖥️', label: 'Zeyara Server', desc: 'السيرفر المركزي — يجب تشغيله أولاً' },
 ];
 
 const INCLUDES = [
@@ -49,7 +49,7 @@ export default function Download() {
             <h2 className="section-title">
               حمّل برنامج
               <br />
-              <span className="gradient-text">ZIARA Smart Clinic</span>
+              <span className="gradient-text">Zeyara Clinic</span>
             </h2>
 
             <p style={{

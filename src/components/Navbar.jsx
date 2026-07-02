@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { navbarScroll } from '../motion/motionSystem';
 import './Navbar.css';
-import logoSrc from '../assets/logo.png';
+import logoSrc from '../assets/logo.svg';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -126,9 +126,9 @@ export default function Navbar() {
             className="logo-icon"
             whileHover={{ rotate: [0, -3, 3, 0], transition: { duration: 0.5 } }}
           >
-            <img src={logoSrc} alt="ZIARA" className="logo-img" />
+            <img src={logoSrc} alt="Zeyara" className="logo-img" />
           </motion.div>
-          <span className="logo-text">ZIARA</span>
+          <span className="logo-text">Zeyara</span>
         </motion.a>
 
         {/* Desktop Links */}

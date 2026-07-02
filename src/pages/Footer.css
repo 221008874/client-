@@ -16,7 +16,7 @@
   transform: translate(-50%, -50%);
   width: 700px;
   height: 400px;
-  background: radial-gradient(ellipse, rgba(6, 182, 212, 0.06) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(0, 184, 212, 0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -116,7 +116,7 @@
   transform: translateX(-50%);
   width: 500px;
   height: 300px;
-  background: radial-gradient(ellipse, rgba(6, 182, 212, 0.04) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(0, 184, 212, 0.04) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -145,7 +145,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 184, 212, 0.25);
   position: relative;
   overflow: hidden;
 }
@@ -197,10 +197,10 @@
 }
 
 .social-link:hover {
-  border-color: rgba(6, 182, 212, 0.3);
-  background: rgba(6, 182, 212, 0.08);
+  border-color: rgba(0, 184, 212, 0.3);
+  background: rgba(0, 184, 212, 0.08);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 184, 212, 0.1);
 }
 
 .social-icon-placeholder {
@@ -212,7 +212,7 @@
 }
 
 .social-link:hover .social-icon-placeholder {
-  background: rgba(6, 182, 212, 0.6);
+  background: rgba(0, 184, 212, 0.6);
 }
 
 /* Contact */
@@ -337,7 +337,7 @@
   height: 5px;
   background: var(--accent);
   border-radius: 50%;
-  box-shadow: 0 0 6px rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 6px rgba(0, 184, 212, 0.4);
 }
 
 .badge-dot-blue {

@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion, useScroll, useSpring } from "motion/react";
 import { pageTransition } from "./motion/motionSystem";
-import { useEffect } from "react";
 import Navbar from "./components/Navbar";
+import SplashScreen from "./components/SplashScreen";
 import Hero from "./pages/Hero";
 import Features from "./pages/Features";
 import About from "./pages/About";
@@ -47,7 +48,7 @@ function ScrollProgress() {
         left: 0,
         right: 0,
         height: 2,
-        background: 'linear-gradient(90deg, #06b6d4, #22d3ee, #06b6d4)',
+        background: 'linear-gradient(90deg, #00b8d4, #22d3ee, #00b8d4)',
         transformOrigin: '0%',
         scaleX,
         zIndex: 1001,
@@ -100,18 +101,26 @@ function AnimatedRoutes() {
 }
 
 /* ─────────────────────────────────────────────
-   APP ROOT — Layout shell
+   APP ROOT — Layout shell with splash
    ───────────────────────────────────────────── */
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <ScrollProgress />
-      <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-        <Navbar />
-        <AnimatedRoutes />
-        <Footer />
-      </div>
-    </BrowserRouter>
+    <>
+      {showSplash ? (
+        <SplashScreen onFinish={() => setShowSplash(false)} />
+      ) : (
+        <BrowserRouter>
+          <ScrollToTop />
+          <ScrollProgress />
+          <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+            <Navbar />
+            <AnimatedRoutes />
+            <Footer />
+          </div>
+        </BrowserRouter>
+      )}
+    </>
   );
 }

@@ -48,7 +48,7 @@ export default function Trust() {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
-              لماذا ZIARA؟
+              لماذا Zeyara؟
             </div>
             <h2 className="section-title">
               مصمم للعيادات
@@ -57,7 +57,7 @@ export default function Trust() {
             </h2>
             <p style={{ color: 'var(--text-secondary)', lineHeight: 1.85, marginBottom: 36, fontSize: '1.05rem' }}>
               كتير من العيادات المصرية بتعاني من ضعف الإنترنت، الأنظمة الورقية،
-              وأدوات SaaS غير مستقرة. ZIARA جاي يحل كل ده.
+              وأدوات SaaS غير مستقرة. Zeyara جاي يحل كل ده.
             </p>
             <StaggerParent className="trust-points" stagger={0.05}>
               {trustPoints.map(({ icon, title, desc }, i) => (
@@ -103,7 +103,7 @@ export default function Trust() {
                   </div>
                 </div>
                 <div className="trust-quote">
-                  "ZIARA غيّر طريقة إدارة عيادتي بالكامل. حتى لما النت بيقطع، كل حاجة شغالة والمرضى مش بيحسوا بفرق."
+                  "Zeyara غيّر طريقة إدارة عيادتي بالكامل. حتى لما النت بيقطع، كل حاجة شغالة والمرضى مش بيحسوا بفرق."
                 </div>
                 <div className="trust-stars">★★★★★</div>
 

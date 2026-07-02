@@ -23,3 +23,4 @@ firebase-service-account.json
 service-account.json
 *.p12
 *.pem
+.vercel
